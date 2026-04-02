@@ -14,6 +14,10 @@ const pool = new Pool({
   ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false
 });
 
+
+console.log('DATABASE_URL in prod:', process.env.DATABASE_URL);
+console.log('DATABASE_SSL in prod:', process.env.DATABASE_SSL);
+
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
 app.get('/api/health', async (req, res) => {
