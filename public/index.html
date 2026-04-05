@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TM.Vente — iPad Borne</title>
+<style>
+  :root{
+    --bg:#f6f1e8; --bg2:#efe5d7; --paper:#fffdfa; --paper2:#fbf5ea; --text:#30251f; --muted:#7d695b;
+    --line:#e3d4bf; --gold:#b88c45; --gold2:#d7b169; --wine:#6f2132; --wine2:#8f3549;
+    --green:#4d7b60; --orange:#c48642; --blue:#4d7395; --purple:#7b5c95; --red:#b2524f;
+    --shadow:0 18px 40px rgba(74,49,30,.10); --radius:20px;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text);background:radial-gradient(circle at top right, rgba(215,177,106,.16), transparent 24%),linear-gradient(180deg,#fbf8f2 0%,#f5eee3 48%,#f2e9dc 100%)}
+  h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;letter-spacing:.2px}
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(251,248,242,.88);backdrop-filter:blur(10px);border-bottom:1px solid rgba(184,140,69,.18)}
+  .topbar-inner,.container{max-width:1580px;margin:0 auto;padding:18px 28px}.topbar-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}.brand-badge{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#f5e7cd,#ead4a7);border:1px solid rgba(184,140,69,.18);box-shadow:var(--shadow);font-size:28px}.brand h1{margin:0;font-size:1.5rem}.brand p{margin:4px 0 0;color:var(--muted);font-size:.88rem}
+  .btns{display:flex;gap:10px;flex-wrap:wrap}
+  button,.btn{border:none;cursor:pointer;border-radius:14px;padding:11px 15px;font-weight:700;font-size:.92rem;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s ease}
+  button:hover,.btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:linear-gradient(135deg,var(--wine),var(--wine2));color:#fff;box-shadow:var(--shadow)}
+  .btn-soft{background:rgba(255,253,249,.94);color:var(--text);border:1px solid var(--line)}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#261b15;box-shadow:var(--shadow)}
+  .btn-danger{background:linear-gradient(135deg,#9f4844,#b85b55);color:#fff}.btn-sm{padding:8px 12px;border-radius:12px;font-size:.82rem}
+  .hero{display:grid;grid-template-columns:1fr;gap:22px;margin-top:8px;margin-bottom:24px}.hero-card,.hero-side,.panel,.detail,.kpi,.card,.modal-card{background:rgba(255,253,249,.94);border:1px solid rgba(184,140,69,.18);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .hero-card{padding:30px;background:radial-gradient(circle at top right, rgba(215,177,106,.22), transparent 28%),linear-gradient(145deg,#fffdfa,#f8f0e2)}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(111,33,50,.08);color:var(--wine);font-size:.77rem;text-transform:uppercase;letter-spacing:.8px;font-weight:800}
+  .hero-card h2{margin:18px 0 10px;font-size:2.25rem;line-height:1.05;max-width:760px}.hero-card p{margin:0;max-width:860px;color:var(--muted);line-height:1.65}
+  .hero-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}.mini{padding:14px;border-radius:16px;border:1px solid rgba(184,140,69,.14);background:rgba(255,255,255,.7)}.mini .l{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}.mini .v{margin-top:6px;font-size:1.22rem;font-weight:800}
+  .hero-side{padding:24px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#fffdfa,#faf2e6)}.bullet{display:flex;gap:10px;align-items:flex-start}.bullet i{font-style:normal;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:rgba(184,140,69,.12);color:var(--wine);font-weight:800;flex:0 0 30px}.bullet strong{display:block}.bullet p{margin:2px 0 0;color:var(--muted);font-size:.9rem;line-height:1.55}
+  .dashboard{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:22px}.kpi{padding:18px}.kpi-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.kpi-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgba(184,140,69,.11);font-size:1.1rem}.kpi .label{color:var(--muted);font-size:.77rem;text-transform:uppercase;letter-spacing:.8px}.kpi .value{margin-top:12px;font-size:1.58rem;font-weight:800}.kpi .sub{margin-top:4px;color:var(--muted);font-size:.84rem}
+  .filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}.input,.select,.field input,.field select,.field textarea{width:100%;background:rgba(255,253,249,.94);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--text);font-size:.92rem}.input:focus,.select:focus,.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)} .search{flex:1;min-width:240px}.select{min-width:170px}
+  .layout{display:grid;grid-template-columns:1.02fr 1fr;gap:22px}.left,.right{display:flex;flex-direction:column;gap:18px}.panel{padding:20px}.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}.head h3{margin:0;font-size:1.06rem}.head p{margin:4px 0 0;color:var(--muted);font-size:.88rem}
+  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{padding:18px;background:linear-gradient(180deg,#fffdf9,#faf2e7);cursor:pointer;transition:.18s ease;position:relative;overflow:hidden}.card:before{content:'';position:absolute;inset:0 auto 0 0;width:5px;background:linear-gradient(180deg,var(--gold),var(--wine));opacity:.62}.card:hover{transform:translateY(-2px)}.card.active{outline:2px solid rgba(111,33,50,.18);border-color:rgba(111,33,50,.30)}
+  .status{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:.76rem;font-weight:800}.st-prospection{background:rgba(184,140,69,.14);color:#8c6828}.st-aconfirmer{background:rgba(196,134,66,.14);color:#9c6321}.st-confirme{background:rgba(77,123,96,.14);color:#2d6346}.st-encours{background:rgba(77,115,149,.14);color:#355b79}.st-termine{background:rgba(123,92,149,.14);color:#654680}.st-annule{background:rgba(178,82,79,.14);color:#8c403c}.st-contacter{background:rgba(184,140,69,.14);color:#8c6828}.st-refuser{background:rgba(178,82,79,.14);color:#8c403c}.st-accepter{background:rgba(77,123,96,.14);color:#2d6346}
+  .st-nouveau{background:rgba(77,115,149,.14);color:#355b79}.st-a_relancer{background:rgba(196,134,66,.14);color:#9c6321}.st-fidele{background:rgba(77,123,96,.14);color:#2d6346}.st-vendu{background:rgba(123,92,149,.14);color:#654680}.st-sans_suite{background:rgba(178,82,79,.14);color:#8c403c}
+  .pt-chaud{background:rgba(77,123,96,.14);color:#2d6346}.pt-tiede{background:rgba(196,134,66,.14);color:#9c6321}.pt-froid{background:rgba(178,82,79,.14);color:#8c403c}
+  .card h4{margin:14px 0 8px;font-size:1.08rem}.meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.87rem}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tag{padding:6px 10px;border-radius:999px;background:rgba(111,33,50,.07);border:1px solid rgba(111,33,50,.10);color:var(--wine);font-size:.76rem}
+  .stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:15px}.box{padding:11px 12px;background:rgba(255,255,255,.7);border:1px solid rgba(184,140,69,.12);border-radius:14px}.box .s{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.box .b{margin-top:5px;font-weight:800}
+  .detail{padding:22px;background:linear-gradient(180deg,#fffdfa,#f9f1e5)}.detail-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}.detail-top h3{margin:10px 0 0;font-size:1.7rem;line-height:1.1}.detail-top p{margin:8px 0 0;color:var(--muted);line-height:1.55}
+  .action-row{display:flex;gap:8px;flex-wrap:wrap}.score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}.score{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fffaf3,#f7efde);border:1px solid rgba(184,140,69,.16)}.score .sl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}.score .sv{margin-top:8px;font-size:1.08rem;font-weight:800}
+  .detail-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.tab-btn{background:#fffaf2;border:1px solid var(--line);color:var(--text)}.tab-btn.active{background:linear-gradient(135deg,var(--wine),var(--wine2));color:#fff;border-color:transparent}
+  .tab-pane{display:none;margin-top:16px}.tab-pane.active{display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.info{padding:16px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(184,140,69,.14)}.info h5{margin:0 0 12px;font-size:.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)} .row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed rgba(125,105,91,.22);font-size:.92rem}.row:last-child{border-bottom:none}.row .k{color:var(--muted)}.row .v{text-align:right;font-weight:700}
+  .note-box{padding:16px;border-radius:16px;background:#fffdfa;border:1px solid rgba(184,140,69,.16)}.note-box h5{margin:0 0 10px;font-size:.82rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}.note-box p{margin:0;line-height:1.72;color:#54463d}.pill-list{display:flex;gap:8px;flex-wrap:wrap}.pill{padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#fff5ef,#faece1);border:1px solid rgba(111,33,50,.12);color:var(--wine);font-size:.82rem}
+  .bar{height:9px;border-radius:999px;background:#efe4d3;overflow:hidden;margin-top:8px}.fill{height:100%;border-radius:999px;background:linear-gradient(135deg,var(--gold),var(--wine))}
+  .task-input{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.task-input .input{flex:1;min-width:240px}.task-list{display:flex;flex-direction:column;gap:10px}.task-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.74);border:1px solid rgba(184,140,69,.14)}.task-main{display:flex;align-items:center;gap:12px;flex:1}.task-main input[type=checkbox]{transform:scale(1.12)}.task-done{text-decoration:line-through;color:var(--muted)}
+  .visitor-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.visitor-toolbar .input{flex:1;min-width:220px}
+  .visitor-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.visitor-card{padding:14px;border-radius:14px;background:rgba(255,255,255,.74);border:1px solid rgba(184,140,69,.14)}.visitor-card .s{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.visitor-card .b{margin-top:5px;font-weight:800}
+  .visitor-list{display:flex;flex-direction:column;gap:10px}.visitor-item{padding:14px;border-radius:14px;background:rgba(255,255,255,.8);border:1px solid rgba(184,140,69,.14)}.visitor-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.visitor-name{font-weight:800;font-size:1rem}.visitor-meta{color:var(--muted);font-size:.86rem;margin-top:4px;display:flex;gap:12px;flex-wrap:wrap}.visitor-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.visitor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.visitor-notes{margin-top:10px;color:#54463d;font-size:.9rem;line-height:1.6}
+  .small-list{display:flex;flex-direction:column;gap:10px}.small-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 14px;border-radius:14px;background:linear-gradient(180deg,#fffdfa,#faf2e6);border:1px solid rgba(184,140,69,.14)}.small-item .n{font-weight:800}.small-item .d{margin-top:3px;color:var(--muted);font-size:.84rem}
+  .empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:rgba(255,255,255,.55)} .footer-note{text-align:center;color:var(--muted);font-size:.84rem;margin-top:22px}
+  .hidden{display:none!important}
+  .modal-wrap{position:fixed;inset:0;background:rgba(64,44,28,.34);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}.modal-wrap.open{display:flex}.modal-card{width:min(1100px,100%);max-height:92vh;overflow:auto;background:#fffdfa;border-radius:24px;box-shadow:0 28px 60px rgba(72,46,28,.22)} .modal-head{position:sticky;top:0;padding:18px 22px;background:rgba(255,253,249,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;z-index:2}.modal-head h3{margin:0}.modal-body{padding:22px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;padding:0 22px 22px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}.field label{font-size:.77rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:800}.field textarea{min-height:96px;resize:vertical}.sub-block{padding:15px;border-radius:16px;border:1px solid rgba(184,140,69,.14);background:linear-gradient(180deg,#fffdfa,#faf2e6)}.sub-block h4{margin:0 0 12px;font-size:.96rem}
+  .toast-wrap{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:150}.toast{background:#fffdfa;border:1px solid var(--line);border-left:4px solid var(--wine);padding:12px 14px;border-radius:14px;box-shadow:var(--shadow)}
+  
+  body.ipad-mode{font-size:18px}
+  .hero-card h2{font-size:2.6rem}
+  .input,.select,.field input,.field select,.field textarea{padding:18px 18px;font-size:1.05rem;border-radius:18px;min-height:60px}
+  .field textarea{min-height:140px}
+  button,.btn{min-height:56px;padding:14px 18px;font-size:1rem;border-radius:18px}
+  .btn-sm{min-height:50px;padding:12px 16px;font-size:.95rem}
+  .app-tabs{justify-content:center;gap:14px}
+  .app-tab{min-width:180px}
+  #viewClients .panel{max-width:1100px;margin:0 auto}
+  #viewClients .sub-block{padding:26px;border-radius:22px}
+  #viewClients .head h3{font-size:1.4rem}
+  #viewClients .head p{font-size:1rem}
+  .ipad-callout{margin-top:14px;padding:18px 20px;border-radius:18px;background:linear-gradient(135deg,rgba(184,140,69,.12),rgba(111,33,50,.07));border:1px solid rgba(184,140,69,.18);text-align:center;font-weight:700;color:var(--wine)}
+  .topbar-inner{align-items:center}
+  .brand-badge{width:64px;height:64px;font-size:30px}
+  .brand h1{font-size:1.7rem}
+  .global-client-item{padding:18px}
+  .visitor-item,.card,.detail,.panel{border-radius:22px}
+  @media (max-width:1024px){
+    .hero{grid-template-columns:1fr}
+    .dashboard{grid-template-columns:repeat(2,1fr)}
+    .global-client-grid,.layout,.cards,.form-grid,.hero-grid,.score-grid,.visitor-stats,.stats4,.grid2{grid-template-columns:1fr}
+    .container,.topbar-inner{padding:16px}
+    .btns{width:100%;justify-content:center}
+  }
+  @media (max-width:768px){
+    .dashboard{grid-template-columns:1fr}
+    .hero-card h2{font-size:2rem}
+    .app-tab{min-width:unset;flex:1}
+  }
+
+  @media (max-width:1320px){.hero,.layout{grid-template-columns:1fr}.dashboard{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:980px){.hero-grid,.score-grid,.grid2,.cards,.form-grid,.visitor-stats,.stats4{grid-template-columns:1fr}.dashboard{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:680px){.topbar-inner,.container{padding:18px}.dashboard{grid-template-columns:1fr}}
+  @media print{.topbar,.filters,.left,.footer-note,.action-row,.detail-tabs,.btns,.hero-side,.visitor-toolbar{display:none!important} body{background:#fff}.container{max-width:none;padding:0}.layout{display:block}.detail{box-shadow:none;border:none;background:#fff;padding:0}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-badge">🍷</div>
+      <div>
+        <h1>TM.Vente</h1>
+        <p>Version iPad borne — saisie tactile clients sur salon</p>
+      </div>
+    </div>
+    <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+    <input id="clientCsvFile" type="file" accept=".csv,text/csv" class="hidden">
+  </div>
+</header>
+
+<main class="container">
+  <section class="app-tabs">
+    <button class="app-tab btn-sm active" id="appTabDashboard" onclick="setAppView('dashboard')">Tableau de bord</button>
+    <button class="app-tab btn-sm" id="appTabSalons" onclick="setAppView('salons')">Salons</button>
+    <button class="app-tab btn-sm" id="appTabClients" onclick="setAppView('clients')">Nouveau client</button>
+    <button class="app-tab btn-sm" id="appTabClientList" onclick="setAppView('clientList')">Liste clients</button>
+    <button class="app-tab btn-sm" id="appTabPro" onclick="setAppView('pro')">Pro</button>
+    <button class="app-tab btn-sm" id="appTabProList" onclick="setAppView('proList')">Liste clients pro</button>
+  </section>
+
+  <section id="viewDashboard">
+  <section class="hero">
+    <div class="hero-card">
+      <span class="eyebrow">Salons grand public</span>
+      <h2>Bonjour la Ferme Chabran</h2>
+      <p>Voici le récapitulatif des ventes</p>
+      <div class="hero-grid" id="heroGrid"></div>
+    </div>
+  </section>
+
+  <section class="dashboard" id="dashboard"></section>
+  <section class="panel" style="margin-top:18px">
+    <div class="head">
+      <div>
+        <h3>Recommandations ventes</h3>
+        <p>Actions simples à lancer pour vendre plus sur tes prochains salons.</p>
+      </div>
+    </div>
+    <div class="small-list" id="salesRecommendations"></div>
+  </section>
+  </section>
+
+  <section class="filters" id="viewSalonsFilters">
+    <input id="search" class="input search" placeholder="Rechercher un salon, une ville, une note, une cuvée..." oninput="renderAll()">
+    <select id="filterYear" class="select" onchange="renderAll()"><option value="">Toutes les années</option></select>
+    <select id="sortBy" class="select" onchange="renderAll()">
+      <option value="date">Tri par date</option>
+      <option value="roi">Tri par ROI</option>
+      <option value="ca">Tri par CA</option>
+      <option value="visiteurs">Tri par visiteurs</option>
+      <option value="name">Tri par nom</option>
+    </select>
+  </section>
+
+  <section class="layout" id="viewSalons">
+    <div class="left">
+      <div class="panel">
+        <div class="head">
+          <div>
+            <h3>Liste des salons</h3>
+            <p>Sélectionne une carte pour afficher la fiche premium complète et sa liste visiteurs.</p>
+          </div>
+          <div class="action-row">
+            <button class="btn-primary btn-sm" onclick="openSalonEditor()">+ Nouveau salon</button>
+            <button class="btn-soft btn-sm" onclick="duplicateCurrent()">Dupliquer</button>
+            <button class="btn-soft btn-sm" onclick="openSalonEditor(activeId)">Modifier</button>
+            <button class="btn-danger btn-sm" onclick="deleteCurrentSalon()">Supprimer</button>
+          </div>
+        </div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="detail" id="detail"></div>
+      <div class="panel">
+        <div class="head">
+          <div>
+            <h3>Actions recommandées</h3>
+            <p>Priorités rapides à traiter pour le salon et ses visiteurs.</p>
+          </div>
+        </div>
+        <div class="small-list" id="actionList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewNewSalon" class="hidden">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h3>Nouveau salon</h3>
+          <p>Crée rapidement une nouvelle fiche salon avant ou pendant un événement.</p>
+        </div>
+      </div>
+      <div class="ipad-callout">Utilise cet onglet pour ajouter un nouveau salon sans passer par la liste.</div>
+      <div class="sub-block" style="max-width:820px;margin:0 auto;text-align:center">
+        <h3 style="margin-bottom:10px">Créer une nouvelle fiche salon</h3>
+        <p style="margin-bottom:16px;color:var(--muted)">Le formulaire complet s’ouvre dans la fenêtre d’édition habituelle.</p>
+        <div class="action-row" style="justify-content:center">
+          <button class="btn-primary" onclick="openNewSalonTab()">Ouvrir le formulaire</button>
+          <button class="btn-soft" onclick="setAppView('salons')">Voir les salons</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewClients" class="hidden">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h3>Nouvelle fiche client</h3>
+          <p>Le client peut remplir lui-même ses informations et les relier au salon concerné.</p>
+        </div>
+      </div>
+      <div class="sub-block" style="max-width:920px;margin:0 auto">
+        <form id="globalClientForm" onsubmit="event.preventDefault(); saveGlobalClient();">
+          <div class="form-grid">
+            <div class="field"><label>Salon</label><select id="gc_salonId"></select></div>
+            <div class="field"><label>Prénom</label><input id="gc_prenom" required placeholder="Votre prénom"></div>
+            <div class="field"><label>Nom</label><input id="gc_nom" required placeholder="Votre nom"></div>
+            <div class="field"><label>Ville</label><input id="gc_ville" placeholder="Votre ville"></div>
+            <div class="field"><label>Email</label><input id="gc_email" type="email" placeholder="votre@email.com"></div>
+            <div class="field"><label>Téléphone</label><input id="gc_tel" placeholder="Votre téléphone"></div>
+            <div class="field full"><label>Adresse</label><input id="gc_adresse" placeholder="Votre adresse complète"></div>
+            <div class="field full"><label>Message</label><textarea id="gc_notes" placeholder="Un commentaire, une demande ou une précision..."></textarea></div>
+          </div>
+          <div class="action-row" style="margin-top:14px">
+            <button class="btn-primary" type="submit">Envoyer mes informations</button>
+            <button class="btn-soft" type="button" onclick="resetGlobalClientForm()">Vider</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewClientList" class="hidden">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h3>Liste clients</h3>
+          <p>Chaque ligne indique le salon auquel le client est rattaché.</p>
+        </div>
+        <div class="action-row">
+          <button class="btn-soft btn-sm" onclick="triggerClientCsvImport()">Importer CSV</button>
+          <button class="btn-soft btn-sm" onclick="toggleSelectAllClients(true)">Tout sélectionner</button>
+          <button class="btn-soft btn-sm" onclick="toggleSelectAllClients(false)">Tout désélectionner</button>
+          <button class="btn-gold btn-sm" onclick="exportSelectedEmailsCSV()">Exporter mails</button>
+          <button class="btn-danger btn-sm" onclick="deleteSelectedClients()">Supprimer la sélection</button>
+        </div>
+      </div>
+      <div class="sub-block" style="margin-bottom:14px">
+        <input id="globalClientSearch" class="input" placeholder="Rechercher un client, une ville ou un salon..." oninput="renderGlobalClients()">
+        <div class="filter-row">
+          <select id="globalClientSalonFilter" class="select" onchange="renderGlobalClients()"></select>
+        </div>
+      </div>
+      <div class="global-client-list" id="globalClientList"></div>
+    </div>
+  </section>
+
+  <section id="viewPro" class="hidden">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h3>Prospection pro</h3>
+          <p>Pour démarcher des cavistes, restaurants et comités d’entreprise rencontrés sur salon.</p>
+        </div>
+        <div class="action-row">
+          <button class="btn-soft btn-sm" type="button" onclick="linkProToActiveSalon()">Utiliser le salon sélectionné</button>
+        </div>
+      </div>
+      <div class="pro-grid">
+        <div class="sub-block">
+          <form id="proForm" onsubmit="event.preventDefault(); savePro();">
+            <input type="hidden" id="p_id">
+            <input type="hidden" id="p_oldSalonId">
+            <div class="form-grid">
+              <div class="field"><label>Salon lié</label><select id="p_salonId" onchange="renderProList()"></select></div>
+              <div class="field"><label>Type</label>
+                <select id="p_type">
+                  <option value="caviste">Caviste</option>
+                  <option value="restaurant">Restaurant</option>
+                  <option value="comite">Comité d'entreprise</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+              <div class="field full"><label>Entreprise / établissement</label><input id="p_entreprise" required></div>
+              <div class="field"><label>Prénom</label><input id="p_prenom"></div>
+              <div class="field"><label>Nom</label><input id="p_nom"></div>
+              <div class="field"><label>Ville</label><input id="p_ville"></div>
+              <div class="field"><label>Email</label><input id="p_email" type="email"></div>
+              <div class="field"><label>Téléphone</label><input id="p_tel"></div>
+              <div class="field"><label>Potentiel</label>
+                <select id="p_potentiel">
+                  <option value="chaud">Chaud</option>
+                  <option value="tiede">Tiède</option>
+                  <option value="froid">Froid</option>
+                </select>
+              </div>
+              <div class="field"><label>Suivi</label>
+                <select id="p_suivi">
+                  <option value="nouveau">Nouveau</option>
+                  <option value="a_relancer">À relancer</option>
+                  <option value="rdv">RDV / dégustation</option>
+                  <option value="fidele">Déjà client</option>
+                  <option value="sans_suite">Sans suite</option>
+                </select>
+              </div>
+              <div class="field full"><label>Potentiel volume / commande</label><input id="p_volume" placeholder="Ex. 24 bouteilles / mois, carte des vins, coffrets CE..."></div>
+              <div class="field full"><label>Notes</label><textarea id="p_notes" placeholder="Besoins, style recherché, conditions, délai de relance..."></textarea></div>
+            </div>
+            <div class="action-row" style="margin-top:14px">
+              <button class="btn-primary" type="submit">Enregistrer le prospect</button>
+              <button class="btn-soft" type="button" onclick="resetProForm()">Vider</button>
+              <button class="btn-gold" type="button" onclick="exportProCSV()">Exporter CSV</button>
+            </div>
+          </form>
+        </div>
+        <div>
+          <div class="sub-block" style="margin-bottom:14px">
+            <input id="proSearch" class="input" placeholder="Rechercher une entreprise, un contact, une ville ou un salon..." oninput="renderProList()">
+          </div>
+          <div class="pro-list" id="proList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewProList" class="hidden">
+    <div class="panel">
+      <div class="head">
+        <div>
+          <h3>Liste clients pro</h3>
+          <p>Vue globale de tous les prospects et clients pros rencontrés sur tes salons.</p>
+        </div>
+      </div>
+      <div class="sub-block" style="margin-bottom:14px">
+        <input id="proListSearch" class="input" placeholder="Rechercher une entreprise, un contact, une ville, un salon..." oninput="renderProClientList()">
+      </div>
+      <div class="pro-list" id="proClientList"></div>
+    </div>
+  </section>
+
+  <div class="footer-note">Les données sont enregistrées automatiquement dans le navigateur.</div>
+</main>
+
+<div class="modal-wrap" id="salonModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="salonModalTitle">Nouveau salon</h3>
+      <button class="btn-soft btn-sm" onclick="closeSalonEditor()">Fermer</button>
+    </div>
+    <div class="modal-body">
+      <form id="salonForm" onsubmit="event.preventDefault(); saveSalon();">
+        <input type="hidden" id="f_id">
+        <div class="form-grid">
+          <div class="field full"><label>Nom du salon</label><input id="f_nom" required></div>
+          <div class="field"><label>Date de début</label><input id="f_dateDebut" type="date" required></div>
+          <div class="field"><label>Date de fin</label><input id="f_dateFin" type="date"></div>
+          <div class="field"><label>Ville</label><input id="f_ville"></div>
+          <div class="field"><label>Région / pays</label><input id="f_region"></div>
+          <div class="field"><label>Statut</label>
+            <select id="f_statut">
+              <option value="contacter">Contacter</option>
+              <option value="refuser">Refuser</option>
+              <option value="accepter">Accepter</option>
+            </select>
+          </div>
+          <div class="field"><label>Type</label>
+            <select id="f_type">
+              <option value="grand_public">Grand public</option>
+              <option value="mixte">Mixte</option>
+              <option value="local">Local</option>
+            </select>
+          </div>
+          <div class="field"><label>Organisateur</label><input id="f_organisateur"></div>
+          <div class="field"><label>Surface stand (m²)</label><input id="f_surface" type="number" min="0" step="0.5"></div>
+          <div class="field full"><label>Stock par cuvée</label><textarea id="f_stockCuvees" placeholder="Ex. Blanc ; 24
+Rouge Tradition ; 36
+Rosé ; 12"></textarea></div>
+          <div class="field full"><label>Site web</label><input id="f_siteWeb" type="url"></div>
+          <div class="field full"><label>Cuvées présentées (séparées par virgule)</label><input id="f_vins"></div>
+
+          <div class="field full sub-block">
+            <h4>Budget détaillé</h4>
+            <div class="form-grid">
+              <div class="field"><label>Stand (€)</label><input id="f_costStand" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Transport (€)</label><input id="f_costTravel" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Hébergement (€)</label><input id="f_costLodging" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Échantillons (€)</label><input id="f_costSamples" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Autres coûts (€)</label><input id="f_costOther" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Budget total calculé</label><input id="f_budgetTotal" disabled></div>
+            </div>
+          </div>
+
+          <div class="field full sub-block">
+            <h4>Résultats grand public</h4>
+            <div class="form-grid">
+              <div class="field"><label>CA sur salon (€)</label><input id="f_salesOnsite" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>CA après salon (€)</label><input id="f_salesAfter" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Visiteurs intéressés</label><input id="f_interesses" type="number" min="0"></div>
+              <div class="field"><label>Acheteurs sur place</label><input id="f_acheteurs" type="number" min="0"></div>
+              <div class="field"><label>Inscriptions newsletter</label><input id="f_newsletter" type="number" min="0"></div>
+              <div class="field"><label>Clients à relancer</label><input id="f_relances" type="number" min="0"></div>
+              <div class="field"><label>Niveau de suivi</label>
+                <select id="f_relanceLevel">
+                  <option value="aucune">Aucune</option>
+                  <option value="a_faire">À faire</option>
+                  <option value="en_cours">En cours</option>
+                  <option value="faite">Faite</option>
+                </select>
+              </div>
+              <div class="field"><label>Prochaine action</label><input id="f_nextAction"></div>
+            </div>
+          </div>
+
+          <div class="field full"><label>Notes terrain</label><textarea id="f_notes"></textarea></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-soft" onclick="closeSalonEditor()">Annuler</button>
+      <button class="btn-primary" onclick="saveSalon()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrap" id="visitorModal">
+  <div class="modal-card" style="width:min(900px,100%)">
+    <div class="modal-head">
+      <h3 id="visitorModalTitle">Nouveau visiteur</h3>
+      <button class="btn-soft btn-sm" onclick="closeVisitorEditor()">Fermer</button>
+    </div>
+    <div class="modal-body">
+      <form id="visitorForm" onsubmit="event.preventDefault(); saveVisitor();">
+        <input type="hidden" id="v_salonId">
+        <input type="hidden" id="v_id">
+        <div class="form-grid">
+          <div class="field"><label>Salon</label><select id="v_salonSelect"></select></div>
+          <div class="field"><label>Prénom</label><input id="v_prenom"></div>
+          <div class="field"><label>Nom</label><input id="v_nom" required></div>
+          <div class="field"><label>Ville / secteur</label><input id="v_ville"></div>
+          <div class="field"><label>Email</label><input id="v_email" type="email"></div>
+          <div class="field"><label>Téléphone</label><input id="v_tel"></div>
+          <div class="field full"><label>Adresse</label><input id="v_adresse"></div>
+          <div class="field"><label>Intérêt</label>
+            <select id="v_potentiel">
+              <option value="chaud">Chaud</option>
+              <option value="tiede">Tiède</option>
+              <option value="froid">Froid</option>
+            </select>
+          </div>
+          <div class="field"><label>Suivi</label>
+            <select id="v_suivi">
+              <option value="nouveau">Nouveau</option>
+              <option value="a_relancer">À relancer</option>
+              <option value="fidele">Client fidèle</option>
+              <option value="vendu">A acheté</option>
+              <option value="sans_suite">Sans suite</option>
+            </select>
+          </div>
+          <div class="field"><label>Montant achat / potentiel (€)</label><input id="v_montant" type="number" min="0" step="0.01"></div>
+          <div class="field"><label>Prochaine relance</label><input id="v_relance" type="date"></div>
+          <div class="field full"><label>Cuvées appréciées</label><input id="v_cuvees"></div>
+          <div class="field"><label>Inscrit newsletter</label>
+            <select id="v_newsletter"><option value="oui">Oui</option><option value="non">Non</option></select>
+          </div>
+          <div class="field"><label>Visite caveau souhaitée</label>
+            <select id="v_caveau"><option value="oui">Oui</option><option value="non">Non</option></select>
+          </div>
+          <div class="field full"><label>Notes</label><textarea id="v_notes"></textarea></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-soft" onclick="closeVisitorEditor()">Annuler</button>
+      <button class="btn-primary" onclick="saveVisitor()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+
+// --- SYNCHRONISATION CLOUD AUTOMATIQUE ---
+window.addEventListener('DOMContentLoaded', () => {
+    fetchFromCloud();
+});
+
+async function fetchFromCloud() {
+    try {
+        const res = await fetch('/api/sync');
+        if(res.ok) {
+            const data = await res.json();
+            // On s'assure qu'on a bien reçu les données
+            if(data && Array.isArray(data) && data.length > 0) {
+                salons = data;
+                if(!salons.find(s => s.id === activeId)) {
+                    activeId = salons[0] ? salons[0].id : null;
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(salons));
+                renderAll();
+                console.log("☁️ Données cloud chargées avec succès.");
+                if(typeof toast === 'function') toast('☁️ Données synchronisées !');
+            }
+        }
+    } catch(e) {
+        console.error('Mode hors ligne ou serveur indisponible', e);
+    }
+}
+
+async function syncCloud() {
+    try {
+        await fetch('/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(salons)
+        });
+        console.log("☁️ Sauvegardé sur le cloud.");
+    } catch(e) {
+        console.error('Erreur sauvegarde cloud', e);
+    }
+}
+
+// On cache l'envoi au cloud dans l'action de sauvegarde habituelle
+setTimeout(() => {
+    if(typeof saveData !== 'undefined') {
+        saveData = function() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(salons)); // Sauvegarde locale iPad
+            syncCloud(); // Envoi magique et invisible au serveur
+        };
+    }
+}, 500);
+// --- FIN SYNCHRONISATION CLOUD ---
+
+const STORAGE_KEY = 'salons_vins_luxe_particuliers_v1';
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function sampleVisitor(prenom, nom, ville, suivi, potentiel, montant, cuvees, notes, newsletter='oui', caveau='non', adresse=''){
+  return {id: uid(), prenom, nom, ville, email:'', tel:'', adresse, potentiel, suivi, montant, relance:'', cuvees, newsletter, caveau, notes, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+}
+const defaultSalons = [
+  {
+    id: uid(), nom:'Salon des Vins de Genas', dateDebut:'2026-03-21', dateFin:'2026-03-23', ville:'Genas', region:'Auvergne-Rhône-Alpes', statut:'termine', type:'grand_public', organisateur:'Comité du salon', siteWeb:'', surface:12,
+    vins:'Rouge domaine, Rosé, Cuvée Prestige', notes:'Salon rentable en vente directe. Bonne ambiance, trafic régulier et plusieurs visiteurs intéressés par un retour au domaine.',
+    costStand:720, costTravel:150, costLodging:0, costSamples:180, costOther:90, salesOnsite:3680, salesAfter:1200, interesses:36, acheteurs:17, newsletter:14, relances:9, relanceLevel:'faite', nextAction:'Relancer les meilleurs visiteurs avec une offre caveau.',
+    tasks:[{id:uid(),text:'Envoyer un message aux nouveaux visiteurs',done:false}],
+    visitors:[
+      sampleVisitor('Claire','Dumas','Lyon','vendu','chaud',420,'Rouge domaine, Cuvée Prestige','A acheté plusieurs cartons.','oui','oui','12 rue des Fleurs, Lyon'),
+      sampleVisitor('Marc','Petit','Meyzieu','a_relancer','tiede',150,'Rosé','Souhaite revenir cet été avec des amis.','oui','oui','8 avenue Centrale, Meyzieu'),
+      sampleVisitor('Famille','Bernard','Bron','fidele','chaud',280,'Rouge domaine','Clients réguliers, aiment les millésimes plus structurés.','oui','non','3 impasse du Parc, Bron')
+    ], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
+  },
+  {
+    id: uid(), nom:'Foire aux Vins de Tignes', dateDebut:'2026-07-20', dateFin:'2026-07-22', ville:'Tignes', region:'Savoie', statut:'aconfirmer', type:'local', organisateur:'Organisation locale', siteWeb:'', surface:10,
+    vins:'Rosé d’été, Blanc frais, Rouge domaine', notes:'Format très adapté à une clientèle de particuliers de montagne et de vacanciers.',
+    costStand:420, costTravel:100, costLodging:0, costSamples:140, costOther:60, salesOnsite:0, salesAfter:0, interesses:0, acheteurs:0, newsletter:0, relances:0, relanceLevel:'a_faire', nextAction:'Confirmer l’inscription et préparer une offre découverte.',
+    tasks:[{id:uid(),text:'Valider les conditions d’inscription',done:false}], visitors:[], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
+  },
+  {
+    id: uid(), nom:'Salon Gourmand & Vins de Printemps', dateDebut:'2026-04-12', dateFin:'2026-04-13', ville:'Annecy', region:'Haute-Savoie', statut:'confirme', type:'grand_public', organisateur:'Association locale', siteWeb:'', surface:14,
+    vins:'Blanc parcellaire, Rosé, Rouge domaine', notes:'Cibler une présentation conviviale, dégustation facile et offres carton.',
+    costStand:850, costTravel:120, costLodging:0, costSamples:210, costOther:90, salesOnsite:0, salesAfter:0, interesses:0, acheteurs:0, newsletter:0, relances:0, relanceLevel:'a_faire', nextAction:'Préparer fiches dégustation et lots découverte.',
+    tasks:[{id:uid(),text:'Préparer les offres 6 bouteilles',done:false}], visitors:[], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
+  }
+];
+let salons = loadData();
+let activeId = salons[0]?.id || null;
+let detailTab = 'overview';
+let visitorSearch = '';
+let appView = 'dashboard';
+let selectedClients = [];
+let salonCsvTargetId = null;
+function loadData(){ try{ const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); return Array.isArray(saved) && saved.length ? saved : defaultSalons; }catch(e){ return defaultSalons; } }
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(salons)); }
+function n(v){ return Number(v) || 0; }
+function euro(v){ return n(v).toLocaleString('fr-FR',{maximumFractionDigits:0}) + ' €'; }
+function integer(v){ return n(v).toLocaleString('fr-FR'); }
+function percent(v){ return isFinite(v) ? Math.round(v) + ' %' : '—'; }
+function dateFr(v){ if(!v) return '—'; const [y,m,d] = v.split('-'); return `${d}/${m}/${y}`; }
+function days(a,b){ if(!a) return '—'; const d1 = new Date(a); const d2 = b ? new Date(b) : new Date(a); return Math.round((d2-d1)/86400000)+1; }
+function typeLabel(v){ return ({grand_public:'Grand public',mixte:'Mixte',local:'Local'})[v] || '—'; }
+function statusLabel(v){ return ({contacter:'Contacter',refuser:'Refuser',accepter:'Accepter',prospection:'Contacter',aconfirmer:'Contacter',confirme:'Accepter',encours:'Accepter',termine:'Accepter',annule:'Refuser'})[v] || v; }
+function relanceLabel(v){ return ({aucune:'Aucune',a_faire:'À faire',en_cours:'En cours',faite:'Faite'})[v] || '—'; }
+function suiviLabel(v){ return ({nouveau:'Nouveau',a_relancer:'À relancer',fidele:'Client fidèle',vendu:'A acheté',sans_suite:'Sans suite'})[v] || v; }
+function potentielLabel(v){ return ({chaud:'Chaud',tiede:'Tiède',froid:'Froid'})[v] || v; }
+function totalBudget(s){ return n(s.costStand)+n(s.costTravel)+n(s.costLodging)+n(s.costSamples)+n(s.costOther); }
+function totalCA(s){ return n(s.salesOnsite)+n(s.salesAfter); }
+function totalVisitors(s){ return (s.visitors || []).length; }
+function totalVisitorPotential(s){ return (s.visitors || []).reduce((a,c)=>a+n(c.montant),0); }
+function roi(s){ return totalBudget(s) > 0 ? (totalCA(s)/totalBudget(s))*100 : NaN; }
+function conversion(s){ return n(s.interesses) > 0 ? (n(s.acheteurs)/n(s.interesses))*100 : NaN; }
+function profitabilityText(s){ const r = roi(s); if(!isFinite(r)) return 'À mesurer'; if(r>=180) return 'Excellent'; if(r>=120) return 'Bon'; if(r>=80) return 'Moyen'; return 'Faible'; }
+function wines(s){ return (s.vins || '').split(',').map(x=>x.trim()).filter(Boolean); }
+function parseStockCuvees(text){ return String(text || '').split(/\n+/).map(l => l.trim()).filter(Boolean).map(line => { const parts=line.split(';'); const name=(parts[0] || '').trim(); const qty=Number((parts[1] || '').replace(',', '.').trim()) || 0; return {name, qty}; }).filter(x => x.name); }
+function totalStockFromText(text){ return parseStockCuvees(text).reduce((a,c)=>a+(Number(c.qty)||0),0); }
+function stockItems(s){ if(s?.stockCuvees) return parseStockCuvees(s.stockCuvees); if(s?.stockPris) return [{name:'Stock total', qty:Number(s.stockPris)||0}]; return []; }
+function stockHtml(s){ const items=stockItems(s); return items.length ? items.map(x => `<div class="row"><span class="k">${escapeHtml(x.name)}</span><span class="v">${integer(x.qty)}</span></div>`).join('') : '<div class="row"><span class="k">Stock</span><span class="v">—</span></div>'; }
+function soldItems(s){ return parseStockCuvees(s?.stockVendus || ''); }
+function soldQtyFor(s, name){ const item = soldItems(s).find(x => x.name===name); return Number(item?.qty) || 0; }
+function totalSold(s){ return stockItems(s).reduce((a,c)=>a+soldQtyFor(s, c.name),0); }
+function totalRemaining(s){ return stockItems(s).reduce((a,c)=>a+Math.max(0, (Number(c.qty)||0) - soldQtyFor(s, c.name)),0); }
+function renderSalonStockTab(s){ const items = stockItems(s); if(!items.length) return `<div class="empty">Aucun stock par cuvée saisi pour ce salon.</div>`; const rows = items.map((x,i) => { const sold = soldQtyFor(s, x.name); const rem = Math.max(0, (Number(x.qty)||0) - sold); return `<div class="sub-block" style="margin-bottom:10px"><div class="form-grid"><div class="field"><label>Cuvée</label><input value="${escapeHtml(x.name)}" disabled></div><div class="field"><label>Pris</label><input value="${integer(x.qty)}" disabled></div><div class="field"><label>Vendu</label><input type="number" min="0" step="1" id="sold_${i}" data-cuvee="${escapeHtml(x.name)}" value="${sold || ''}"></div><div class="field"><label>Restant</label><input value="${integer(rem)}" disabled></div></div></div>`; }).join(''); return `<div class="visitor-stats"><div class="visitor-card"><div class="s">Stock pris</div><div class="b">${integer(stockItems(s).reduce((a,c)=>a+(Number(c.qty)||0),0))}</div></div><div class="visitor-card"><div class="s">Vendu</div><div class="b">${integer(totalSold(s))}</div></div><div class="visitor-card"><div class="s">Restant</div><div class="b">${integer(totalRemaining(s))}</div></div></div><div style="margin-top:12px">${rows}</div><div class="action-row" style="margin-top:12px"><button class="btn-primary btn-sm" onclick="saveSalonSoldStock()">Enregistrer les ventes</button></div>`; }
+function saveSalonSoldStock(){ const s = activeSalon(); if(!s) return; const inputs = [...document.querySelectorAll('[id^="sold_"]')]; const lines = inputs.map(inp => { const name = inp.getAttribute('data-cuvee') || ''; const qty = Number(inp.value || 0) || 0; return name ? `${name} ; ${qty}` : ''; }).filter(Boolean); s.stockVendus = lines.join('\n'); s.updatedAt = new Date().toISOString(); toast('Ventes du stock enregistrées.'); renderAll(); }
+function activeSalon(){ return salons.find(s=>s.id===activeId) || salons[0] || null; }
+function ensureOtherProSalon(){ let s = salons.find(x => x.id==='__other_pro__'); if(!s){ s = { id:'__other_pro__', nom:'Autre', dateDebut:'', dateFin:'', ville:'', region:'Autre région', statut:'prospection', type:'local', organisateur:'', surface:0, siteWeb:'', vins:'', notes:'', costStand:0, costTravel:0, costLodging:0, costSamples:0, costOther:0, salesOnsite:0, salesAfter:0, interesses:0, acheteurs:0, newsletter:0, relances:0, relanceLevel:'aucune', nextAction:'', tasks:[], visitors:[], prospectsPro:[], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() }; salons.push(s); } return s; }
+function filteredSalons(){
+  const q = (document.getElementById('search')?.value || '').toLowerCase();
+  const st = document.getElementById('filterStatus')?.value || '';
+  const year = document.getElementById('filterYear')?.value || '';
+  const sort = document.getElementById('sortBy')?.value || 'date';
+  let list = salons.filter(s => s.id!=='__other_pro__').filter(s => { const blob = [s.nom,s.ville,s.region,s.notes,s.vins,s.organisateur,s.nextAction].join(' ').toLowerCase(); return (!q || blob.includes(q)) && (!st || s.statut===st) && (!year || (s.dateDebut||'').startsWith(year)); });
+  list.sort((a,b)=>{ if(sort==='roi') return (roi(b)||-1) - (roi(a)||-1); if(sort==='ca') return totalCA(b)-totalCA(a); if(sort==='visiteurs') return totalVisitors(b)-totalVisitors(a); if(sort==='name') return (a.nom||'').localeCompare(b.nom||''); return (a.dateDebut||'').localeCompare(b.dateDebut||''); });
+  return list;
+}
+function filteredVisitors(salon){ const q = visitorSearch.toLowerCase().trim(); const visitors = salon?.visitors || []; return visitors.filter(v => !q || [v.nom,v.ville,v.email,v.tel,v.notes,v.cuvees,v.suivi].join(' ').toLowerCase().includes(q)); }
+function renderYearFilter(){ const years = [...new Set(salons.filter(s=>s.id!=='__other_pro__').map(s=>(s.dateDebut||'').slice(0,4)).filter(Boolean))].sort(); const el=document.getElementById('filterYear'); const cur=el.value; el.innerHTML='<option value="">Toutes les années</option>' + years.map(y => `<option value="${y}" ${cur===y?'selected':''}>${y}</option>`).join(''); }
+function renderHero(){ const vals = [['Salons suivis', integer(salons.length)], ['Visiteurs saisis', integer(salons.reduce((a,s)=>a+totalVisitors(s),0))], ['CA total', euro(salons.reduce((a,s)=>a+totalCA(s),0))], ['Budget total', euro(salons.reduce((a,s)=>a+totalBudget(s),0))], ['Potentiel visiteurs', euro(salons.reduce((a,s)=>a+totalVisitorPotential(s),0))]]; document.getElementById('heroGrid').innerHTML = vals.map(v => `<div class="mini"><div class="l">${v[0]}</div><div class="v">${v[1]}</div></div>`).join(''); }
+function renderDashboard(){
+  const budget = salons.reduce((a,s)=>a+totalBudget(s),0), ca = salons.reduce((a,s)=>a+totalCA(s),0), interesses = salons.reduce((a,s)=>a+n(s.interesses),0), acheteurs = salons.reduce((a,s)=>a+n(s.acheteurs),0), visiteurs = salons.reduce((a,s)=>a+totalVisitors(s),0), newsletter = salons.reduce((a,s)=>a+n(s.newsletter),0), relances = salons.reduce((a,s)=>a+n(s.relances),0), stockPris = salons.reduce((a,s)=>a+(totalStockFromText(s.stockCuvees) || s.stockPris || 0),0), stockVendu = salons.reduce((a,s)=>a+totalSold(s),0), stockRestant = salons.reduce((a,s)=>a+totalRemaining(s),0);
+  const avgROI = budget>0 ? (ca/budget)*100 : NaN;
+  const conv = interesses>0 ? (acheteurs/interesses)*100 : NaN;
+  const avgBasket = acheteurs>0 ? ca/acheteurs : NaN;
+  const captureRate = visiteurs>0 ? (newsletter/visiteurs)*100 : NaN;
+  const cards = [
+    ['CA réalisé', euro(ca), 'Salon + après-salon', '💶'],
+    ['ROI global', percent(avgROI), 'CA / budget', '📈'],
+    ['Conversion', percent(conv), integer(acheteurs) + ' acheteurs', '🛒'],
+    ['Panier moyen', euro(avgBasket), 'CA / acheteurs', '🧺'],
+    ['Newsletter', integer(newsletter), percent(captureRate) + ' des visiteurs', '✉️'],
+    ['Relances', integer(relances), 'Clients à recontacter', '📞'],
+    ['Stock vendu', integer(stockVendu), 'Sur ' + integer(stockPris) + ' pris', '🍷'],
+    ['Stock restant', integer(stockRestant), 'À écouler / réaffecter', '📦']
+  ];
+  document.getElementById('dashboard').innerHTML = cards.map(c => `<div class="kpi"><div class="kpi-top"><div class="label">${c[0]}</div><div class="kpi-icon">${c[3]}</div></div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join('');
+  renderSalesRecommendations({budget, ca, interesses, acheteurs, visiteurs, newsletter, relances, stockPris, stockVendu, stockRestant, avgROI, conv, avgBasket, captureRate});
+}
+function renderSalesRecommendations(m){
+  const items = [];
+  if(!m.ca) items.push(['Aucune vente saisie', 'Commence par renseigner les ventes par salon et par cuvée pour obtenir des conseils fiables.']);
+  if(isFinite(m.conv) && m.conv < 20) items.push(['Améliorer la conversion', 'Travaille une offre simple sur le stand : 3 bouteilles, carton découverte ou remise caveau pour faire passer plus d’intéressés à l’achat.']);
+  if(isFinite(m.captureRate) && m.captureRate < 25) items.push(['Collecter plus de contacts', 'Propose une inscription newsletter ou une offre caveau à chaque échange pour transformer plus de visiteurs en relances exploitables.']);
+  if(m.relances > 0) items.push(['Relancer vite', 'Les clients à relancer doivent être rappelés sous 48 à 72 h après salon avec une offre claire et les cuvées dégustées.']);
+  if(m.stockRestant > 0) items.push(['Écouler le stock restant', 'Prévois une campagne post-salon : caveau, email ou offre cartons pour écouler le stock encore disponible.']);
+  if(isFinite(m.avgBasket) && m.avgBasket < 60) items.push(['Augmenter le panier moyen', 'Mets en avant des lots de 6, cartons panachés et magnums pour faire monter le montant moyen par acheteur.']);
+  if(isFinite(m.avgROI) && m.avgROI < 100) items.push(['Mieux choisir les salons', 'Compare budget, ville, trafic et CA pour privilégier les salons les plus rentables et réduire ceux qui vendent peu.']);
+  if(!items.length) items.push(['Bonne dynamique', 'Tes indicateurs sont cohérents ; concentre-toi sur la relance rapide, la captation newsletter et les offres cartons.']);
+  const root=document.getElementById('salesRecommendations');
+  if(root) root.innerHTML = items.map(x => `<div class="small-item"><div><div class="n">${x[0]}</div><div class="d">${x[1]}</div></div></div>`).join('');
+}
+function renderCards(){
+  const list = filteredSalons(); if(!list.find(s=>s.id===activeId)) activeId = list[0]?.id || salons[0]?.id || null; const root=document.getElementById('cards');
+  if(!list.length){ root.innerHTML='<div class="empty" style="grid-column:1/-1">Aucun salon trouvé.</div>'; return; }
+  root.innerHTML = list.map(s => { const w = wines(s).slice(0,2); return `<article class="card ${s.id===activeId?'active':''}" onclick="selectSalon('${s.id}')"><span class="status st-${s.statut}">${statusLabel(s.statut)}</span><h4>${s.nom}</h4><div class="meta"><span>📍 ${s.ville || '—'}${s.region ? ' · ' + s.region : ''}</span><span>📅 ${dateFr(s.dateDebut)}</span><span>${days(s.dateDebut,s.dateFin)} j</span></div><div class="tags">${(w.length ? w : ['Aucune cuvée']).map(x=>`<span class="tag">${x}</span>`).join('')}</div><div class="stats4"><div class="box"><div class="s">Budget</div><div class="b">${euro(totalBudget(s))}</div></div><div class="box"><div class="s">CA</div><div class="b">${euro(totalCA(s))}</div></div><div class="box"><div class="s">Visiteurs</div><div class="b">${integer(totalVisitors(s))}</div></div><div class="box"><div class="s">ROI</div><div class="b">${percent(roi(s))}</div></div></div></article>`; }).join('');
+}
+function renderDetail(){
+  const s = activeSalon(); const root = document.getElementById('detail'); if(!s){ root.innerHTML='<div class="empty">Ajoute un salon pour commencer.</div>'; return; }
+  const budget = totalBudget(s), ca = totalCA(s), visitorsCount = totalVisitors(s), r = roi(s), conv = conversion(s); const winesHtml = wines(s).length ? wines(s).map(x=>`<span class="pill">${x}</span>`).join('') : '<span class="pill">Aucune cuvée</span>';
+  root.innerHTML = `
+    <div class="detail-top"><div><span class="status st-${s.statut}">${statusLabel(s.statut)}</span><h3>${s.nom}</h3><p>${s.ville || 'Ville à préciser'}${s.region ? ' · ' + s.region : ''} · ${dateFr(s.dateDebut)}${s.dateFin ? ' au ' + dateFr(s.dateFin) : ''} · ${days(s.dateDebut,s.dateFin)} jour(s)</p></div><div class="action-row"><button class="btn-soft btn-sm" onclick="openSalonEditor('${s.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="duplicateSalon('${s.id}')">Dupliquer</button><button class="btn-soft btn-sm" onclick="triggerSalonCsvImport('${s.id}')">Importer CSV</button><button class="btn-danger btn-sm" onclick="deleteSalon('${s.id}')">Supprimer</button></div></div>
+    <div class="score-grid"><div class="score"><div class="sl">Rentabilité</div><div class="sv">${profitabilityText(s)}</div></div><div class="score"><div class="sl">ROI</div><div class="sv">${percent(r)}</div></div><div class="score"><div class="sl">Conversion</div><div class="sv">${percent(conv)}</div></div><div class="score"><div class="sl">Visiteurs</div><div class="sv">${integer(visitorsCount)}</div></div><div class="score"><div class="sl">Stock total</div><div class="sv">${integer(totalStockFromText(s.stockCuvees) || s.stockPris || 0)}</div></div><div class="score"><div class="sl">Potentiel</div><div class="sv">${euro(totalVisitorPotential(s))}</div></div></div>
+    <div class="detail-tabs"><button class="tab-btn btn-sm ${detailTab==='overview'?'active':''}" onclick="setDetailTab('overview')">Vue générale</button><button class="tab-btn btn-sm ${detailTab==='finance'?'active':''}" onclick="setDetailTab('finance')">Budget & CA</button><button class="tab-btn btn-sm ${detailTab==='public'?'active':''}" onclick="setDetailTab('public')">Public & ventes</button><button class="tab-btn btn-sm ${detailTab==='stock'?'active':''}" onclick="setDetailTab('stock')">Stock salon</button><button class="tab-btn btn-sm ${detailTab==='visitors'?'active':''}" onclick="setDetailTab('visitors')">Liste visiteurs</button><button class="tab-btn btn-sm ${detailTab==='tasks'?'active':''}" onclick="setDetailTab('tasks')">Checklist</button><button class="tab-btn btn-sm ${detailTab==='notes'?'active':''}" onclick="setDetailTab('notes')">Notes & cuvées</button></div>
+
+    <div class="tab-pane ${detailTab==='overview'?'active':''}"><div class="grid2"><div class="info"><h5>Identité du salon</h5><div class="row"><span class="k">Type</span><span class="v">${typeLabel(s.type)}</span></div><div class="row"><span class="k">Organisateur</span><span class="v">${s.organisateur || '—'}</span></div><div class="row"><span class="k">Surface stand</span><span class="v">${s.surface ? s.surface + ' m²' : '—'}</span></div><div class="row"><span class="k">Stock total</span><span class="v">${integer(totalStockFromText(s.stockCuvees) || s.stockPris || 0)}</span></div><div class="row"><span class="k">Vendu</span><span class="v">${integer(totalSold(s))}</span></div><div class="row"><span class="k">Restant</span><span class="v">${integer(totalRemaining(s))}</span></div><div class="row"><span class="k">Site web</span><span class="v">${s.siteWeb ? `<a href="${s.siteWeb}" target="_blank" style="color:var(--wine)">ouvrir</a>` : '—'}</span></div></div><div class="info"><h5>Résumé grand public</h5><div class="row"><span class="k">Budget total</span><span class="v">${euro(budget)}</span></div><div class="row"><span class="k">CA total</span><span class="v">${euro(ca)}</span></div><div class="row"><span class="k">Visiteurs intéressés</span><span class="v">${integer(s.interesses)}</span></div><div class="row"><span class="k">Acheteurs</span><span class="v">${integer(s.acheteurs)}</span></div></div></div><div class="note-box" style="margin-top:14px"><h5>Prochaine action</h5><p>${s.nextAction || 'Aucune action définie.'}</p></div></div>
+
+    <div class="tab-pane ${detailTab==='finance'?'active':''}"><div class="grid2"><div class="info"><h5>Budget détaillé</h5>${budgetLine('Stand', s.costStand, budget)}${budgetLine('Transport', s.costTravel, budget)}${budgetLine('Hébergement', s.costLodging, budget)}${budgetLine('Échantillons', s.costSamples, budget)}${budgetLine('Autres', s.costOther, budget)}<div class="row"><span class="k">Total budget</span><span class="v">${euro(budget)}</span></div></div><div class="info"><h5>Recettes</h5><div class="row"><span class="k">CA sur salon</span><span class="v">${euro(s.salesOnsite)}</span></div><div class="row"><span class="k">CA après salon</span><span class="v">${euro(s.salesAfter)}</span></div><div class="row"><span class="k">CA total</span><span class="v">${euro(ca)}</span></div><div class="row"><span class="k">Écart CA - budget</span><span class="v">${euro(ca-budget)}</span></div><div class="row"><span class="k">ROI</span><span class="v">${percent(r)}</span></div></div></div></div>
+
+    <div class="tab-pane ${detailTab==='public'?'active':''}"><div class="grid2"><div class="info"><h5>Public rencontré</h5><div class="row"><span class="k">Visiteurs intéressés</span><span class="v">${integer(s.interesses)}</span></div><div class="row"><span class="k">Acheteurs sur place</span><span class="v">${integer(s.acheteurs)}</span></div><div class="row"><span class="k">Newsletter</span><span class="v">${integer(s.newsletter)}</span></div><div class="row"><span class="k">À relancer</span><span class="v">${integer(s.relances)}</span></div></div><div class="info"><h5>Suivi</h5><div class="row"><span class="k">Niveau de suivi</span><span class="v">${relanceLabel(s.relanceLevel)}</span></div><div class="row"><span class="k">Conversion visiteurs / acheteurs</span><span class="v">${percent(conv)}</span></div><div class="row"><span class="k">Liste visiteurs</span><span class="v">${integer(visitorsCount)}</span></div><div class="row"><span class="k">Potentiel visiteurs</span><span class="v">${euro(totalVisitorPotential(s))}</span></div></div></div></div>
+
+    <div class="tab-pane ${detailTab==='stock'?'active':''}">${renderSalonStockTab(s)}</div>
+
+    <div class="tab-pane ${detailTab==='visitors'?'active':''}">${renderVisitorsTab(s)}</div>
+
+    <div class="tab-pane ${detailTab==='tasks'?'active':''}"><div class="task-input"><input id="taskInput" class="input" placeholder="Ajouter une tâche liée à ce salon..."><button class="btn-primary btn-sm" onclick="addTask()">Ajouter</button></div><div class="task-list">${(s.tasks || []).length ? (s.tasks||[]).map(t=>`<div class="task-item"><div class="task-main"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}')"><div class="${t.done?'task-done':''}">${t.text}</div></div><button class="btn-soft btn-sm" onclick="removeTask('${t.id}')">Supprimer</button></div>`).join('') : '<div class="empty">Aucune tâche pour ce salon.</div>'}</div></div>
+
+    <div class="tab-pane ${detailTab==='notes'?'active':''}"><div class="note-box"><h5>Cuvées présentées</h5><div class="pill-list">${winesHtml}</div></div><div class="note-box" style="margin-top:14px"><h5>Stock par cuvée</h5>${stockHtml(s)}</div><div class="note-box" style="margin-top:14px"><h5>Notes terrain</h5><p>${(s.notes || 'Aucune note enregistrée.').replace(/\n/g,'<br>')}</p></div></div>`;
+}
+function renderVisitorsTab(s){ const list = filteredVisitors(s); const total = totalVisitors(s); const hot = (s.visitors||[]).filter(v=>v.potentiel==='chaud').length; const rel = (s.visitors||[]).filter(v=>v.suivi==='a_relancer').length; const caveau = (s.visitors||[]).filter(v=>v.caveau==='oui').length; const potential = totalVisitorPotential(s); return `<div class="visitor-toolbar"><input class="input" id="visitorSearchInput" placeholder="Rechercher un visiteur, une ville, une note..." value="${escapeHtml(visitorSearch)}" oninput="updateVisitorSearch(this.value)"><button class="btn-primary btn-sm" onclick="openVisitorEditor()">+ Nouveau visiteur</button><button class="btn-soft btn-sm" onclick="exportCurrentVisitorsCSV()">Exporter visiteurs CSV</button></div><div class="visitor-stats"><div class="visitor-card"><div class="s">Visiteurs saisis</div><div class="b">${integer(total)}</div></div><div class="visitor-card"><div class="s">Intérêt chaud</div><div class="b">${integer(hot)}</div></div><div class="visitor-card"><div class="s">À relancer</div><div class="b">${integer(rel)}</div></div><div class="visitor-card"><div class="s">Visite caveau</div><div class="b">${integer(caveau)}</div></div></div><div class="visitor-list">${list.length ? list.map(v => visitorItemHtml(v)).join('') : '<div class="empty">Aucun visiteur dans ce salon.</div>'}</div><div class="note-box" style="margin-top:12px"><h5>Potentiel total de la liste</h5><p>${euro(potential)}</p></div>`; }
+function visitorItemHtml(v){ return `<div class="visitor-item"><div class="visitor-top"><div><div class="visitor-name">${escapeHtml(((v.prenom || '') + ' ' + (v.nom || '')).trim() || 'Sans nom')}</div><div class="visitor-meta">${v.ville ? `<span>📍 ${escapeHtml(v.ville)}</span>` : ''}${v.adresse ? `<span>🏠 ${escapeHtml(v.adresse)}</span>` : ''}${v.email ? `<span>✉ ${escapeHtml(v.email)}</span>` : ''}${v.tel ? `<span>☎ ${escapeHtml(v.tel)}</span>` : ''}${v.cuvees ? `<span>🍷 ${escapeHtml(v.cuvees)}</span>` : ''}</div></div><div style="text-align:right;font-weight:800">${euro(v.montant || 0)}</div></div><div class="visitor-badges"><span class="status pt-${v.potentiel}">${potentielLabel(v.potentiel)}</span><span class="status st-${v.suivi}">${suiviLabel(v.suivi)}</span><span class="status st-confirme">Newsletter ${v.newsletter === 'oui' ? 'oui' : 'non'}</span><span class="status st-aconfirmer">Caveau ${v.caveau === 'oui' ? 'oui' : 'non'}</span>${v.relance ? `<span class="status st-encours">Relance ${dateFr(v.relance)}</span>` : ''}</div>${v.notes ? `<div class="visitor-notes">${escapeHtml(v.notes)}</div>` : ''}<div class="visitor-actions"><button class="btn-soft btn-sm" onclick="openVisitorEditor('${v.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="deleteVisitor('${v.id}')">Supprimer</button></div></div>`; }
+function budgetLine(label, value, total){ const w = total > 0 ? Math.max(4, (n(value)/total)*100) : 4; return `<div style="margin-bottom:10px"><div class="row" style="padding:0 0 4px;border-bottom:none"><span class="k">${label}</span><span class="v">${euro(value)}</span></div><div class="bar"><div class="fill" style="width:${w}%"></div></div></div>`; }
+function renderActionList(){ const items = filteredSalons().slice(0,5).map(s => { let desc = 'Mettre à jour la fiche.'; if(s.statut==='accepter' || s.statut==='confirme' || s.statut==='encours' || s.statut==='termine') desc = 'Préparer les offres cartons, noter les ventes et relancer rapidement les meilleurs contacts.'; if(s.statut==='contacter' || s.statut==='prospection' || s.statut==='aconfirmer') desc = 'Comparer coût, trafic, profil visiteurs et potentiel de vente avant validation.'; if(s.statut==='refuser' || s.statut==='annule') desc = 'Conserver l’historique puis réallouer le budget sur un salon plus rentable.'; return `<div class="small-item"><div><div class="n">${s.nom}</div><div class="d">${desc}</div></div><span class="status st-${s.statut}">${statusLabel(s.statut)}</span></div>`; }); document.getElementById('actionList').innerHTML = items.length ? items.join('') : '<div class="empty">Aucune action disponible.</div>'; }
+function triggerClientCsvImport(){ salonCsvTargetId = null; document.getElementById('clientCsvFile').click(); }
+function triggerSalonCsvImport(salonId){ salonCsvTargetId = salonId; document.getElementById('clientCsvFile').click(); }
+function normalizeHeader(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'').trim(); }
+function splitCsvLine(line, sep){
+  const out=[]; let cur=''; let inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i], next=line[i+1];
+    if(ch==='"'){
+      if(inQuotes && next==='"'){ cur+='"'; i++; }
+      else inQuotes=!inQuotes;
+    }else if(ch===sep && !inQuotes){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out.map(v => v.trim());
+}
+function parseCsv(text){
+  const cleaned = String(text || '').replace(/^\ufeff/, '').replace(/\r/g, '');
+  const lines = cleaned.split('\n').filter(l => l.trim().length);
+  if(lines.length < 2) return [];
+  const sep = (lines[0].split(';').length >= lines[0].split(',').length) ? ';' : ',';
+  const headers = splitCsvLine(lines[0], sep).map(normalizeHeader);
+  return lines.slice(1).map(line => {
+    const values = splitCsvLine(line, sep);
+    const obj={};
+    headers.forEach((h,i) => obj[h] = (values[i] || '').trim());
+    return obj;
+  });
+}
+function findSalonFromCsv(row){
+  const salonName = row.salon || row.salonlie || row.nomsalon || row.evenement || row.salons || '';
+  const salonCity = row.villedusalon || row.villesalon || row.salonville || '';
+  let salon = salons.find(s => normalizeHeader(s.nom) === normalizeHeader(salonName));
+  if(!salon && salonName) salon = salons.find(s => normalizeHeader(s.nom).includes(normalizeHeader(salonName)) || normalizeHeader(salonName).includes(normalizeHeader(s.nom)));
+  if(!salon && salonCity) salon = salons.find(s => normalizeHeader(s.ville) === normalizeHeader(salonCity));
+  return salon || null;
+}
+function mapCsvRowToVisitor(row, defaultSalonId){
+  const prenom = row.prenom || row.firstname || '';
+  const nom = row.nom || row.lastname || row.name || '';
+  const ville = row.ville || row.city || '';
+  const adresse = row.adresse || row.address || '';
+  const email = row.email || row.mail || '';
+  const tel = row.telephone || row.tel || row.mobile || row.phone || '';
+  const notes = row.message || row.notes || row.commentaire || row.commentaires || '';
+  const salon = findSalonFromCsv(row) || salons.find(s => s.id===defaultSalonId) || salons[0] || null;
+  return { salon, visitor: { id: uid(), prenom, nom, ville, adresse, email, tel, potentiel:'tiede', suivi:'nouveau', montant:0, relance:'', cuvees:'', newsletter:'non', caveau:'non', notes, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() } };
+}
+function importClientsCsvText(text, forcedSalonId=null){
+  const rows = parseCsv(text);
+  if(!rows.length){ toast('CSV vide ou invalide.'); return; }
+  let imported = 0, skipped = 0;
+  const fallbackSalonId = forcedSalonId || document.getElementById('gc_salonId')?.value || activeId;
+  const forcedSalon = forcedSalonId ? salons.find(s => s.id===forcedSalonId) : null;
+  rows.forEach(row => {
+    const mapped = mapCsvRowToVisitor(row, fallbackSalonId);
+    const targetSalon = forcedSalon || mapped.salon;
+    if(!targetSalon || (!mapped.visitor.prenom && !mapped.visitor.nom)){ skipped++; return; }
+    targetSalon.visitors = targetSalon.visitors || [];
+    targetSalon.visitors.unshift(mapped.visitor);
+    targetSalon.updatedAt = new Date().toISOString();
+    imported++;
+  });
+  if(imported){ toast(imported + ' client(s) importé(s).'); }
+  if(skipped){ toast(skipped + ' ligne(s) ignorée(s).'); }
+  renderAll();
+}
+function renderSalonOptions(){
+  const label = s => `${escapeHtml(s.nom)} — ${escapeHtml(s.ville || 'Ville à préciser')}${s.region ? ' — ' + escapeHtml(s.region) : ''}`;
+  const fill=(el, current, fallback, withOther=false) => {
+    if(!el) return;
+    let options = salons.map(s => `<option value="${s.id}">${label(s)}</option>`).join('');
+    if(withOther) options += '<option value="__other__">Autre — région à préciser</option>';
+    el.innerHTML = options;
+    const validValues = salons.map(s => s.id).concat(withOther ? ['__other__'] : []);
+    if(current && validValues.includes(current)) el.value=current;
+    else if(fallback && validValues.includes(fallback)) el.value=fallback;
+    else if(salons[0]) el.value=salons[0].id;
+    else if(withOther) el.value='__other__';
+  };
+  const el=document.getElementById('gc_salonId');
+  fill(el, el?.value || '', activeId);
+  const el2=document.getElementById('v_salonSelect');
+  fill(el2, el2?.value || '', document.getElementById('v_salonId')?.value || activeId);
+  const el3=document.getElementById('p_salonId');
+  fill(el3, document.getElementById('p_oldSalonId')?.value || el3?.value || activeId || '', activeId, true);
+  const salonFilter=document.getElementById('globalClientSalonFilter');
+  if(salonFilter){
+    const cur=salonFilter.value;
+    salonFilter.innerHTML = '<option value="">Tous les salons</option>' + salons.map(s => `<option value="${s.id}">${label(s)}</option>`).join('');
+    if(cur && salons.find(s=>s.id===cur)) salonFilter.value=cur;
+  }
+}
+function getFilteredClientRows(){ const q=(document.getElementById('globalClientSearch')?.value || '').toLowerCase(); const salonFilter=document.getElementById('globalClientSalonFilter')?.value || ''; const rows=[]; salons.forEach(s => (s.visitors||[]).forEach(v => rows.push({salon:s, visitor:v}))); return rows.filter(r => { const matchQ = !q || [r.visitor.prenom,r.visitor.nom,r.visitor.ville,r.visitor.adresse,r.visitor.email,r.visitor.tel,r.visitor.notes,r.visitor.cuvees,r.salon.nom].join(' ').toLowerCase().includes(q); const matchSalon = !salonFilter || r.salon.id===salonFilter; return matchQ && matchSalon; }); }
+function renderGlobalClients(){ const root=document.getElementById('globalClientList'); if(!root) return; const allRows=[]; salons.forEach(s => (s.visitors||[]).forEach(v => allRows.push({salon:s, visitor:v}))); const existingKeys = new Set(allRows.map(r => `${r.salon.id}::${r.visitor.id}`)); selectedClients = selectedClients.filter(k => existingKeys.has(k)); const list=getFilteredClientRows(); if(!list.length){ root.innerHTML='<div class="empty">Aucun client enregistré.</div>'; return; } root.innerHTML=list.map(({salon,visitor}) => { const key = `${salon.id}::${visitor.id}`; const checked = selectedClients.includes(key) ? 'checked' : ''; return `<div class="global-client-item"><div class="select-row"><input class="select-box" type="checkbox" ${checked} onchange="toggleClientSelection('${salon.id}','${visitor.id}', this.checked)"><div style="flex:1"><div class="global-client-top"><div><div class="visitor-name">${escapeHtml(((visitor.prenom || '') + ' ' + (visitor.nom || '')).trim() || 'Sans nom')}</div><div class="visitor-meta"><span>Salon : ${escapeHtml(salon.nom)}</span>${visitor.ville ? `<span>📍 ${escapeHtml(visitor.ville)}</span>` : ''}</div></div><div style="text-align:right;font-weight:800">${euro(visitor.montant || 0)}</div></div><div class="visitor-badges"><span class="status pt-${visitor.potentiel}">${potentielLabel(visitor.potentiel)}</span><span class="status st-${visitor.suivi}">${suiviLabel(visitor.suivi)}</span><span class="status st-confirme">${escapeHtml(salon.ville || 'Salon')}</span></div><div class="visitor-notes">${visitor.adresse ? `🏠 ${escapeHtml(visitor.adresse)}<br>` : ''}${visitor.email ? `✉ ${escapeHtml(visitor.email)}<br>` : ''}${visitor.tel ? `☎ ${escapeHtml(visitor.tel)}` : ''}</div>${visitor.notes ? `<div class="visitor-notes">${escapeHtml(visitor.notes)}</div>` : ''}<div class="visitor-actions"><button class="btn-soft btn-sm" onclick="editGlobalClient('${salon.id}','${visitor.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="selectSalon('${salon.id}'); setAppView('salons'); setDetailTab('visitors');">Voir le salon</button></div></div></div></div>`; }).join(''); }
+function editGlobalClient(salonId, visitorId){ activeId = salonId; appView = 'clientList'; renderAll(); openVisitorEditor(visitorId); }
+function toggleClientSelection(salonId, visitorId, checked){ const key = `${salonId}::${visitorId}`; if(checked){ if(!selectedClients.includes(key)) selectedClients.push(key); } else { selectedClients = selectedClients.filter(k => k !== key); } }
+function toggleSelectAllClients(checked){ const keys = getFilteredClientRows().map(r => `${r.salon.id}::${r.visitor.id}`); if(checked){ selectedClients = [...new Set([...selectedClients, ...keys])]; toast(keys.length + ' client(s) sélectionné(s).'); } else { selectedClients = selectedClients.filter(k => !keys.includes(k)); toast('Sélection retirée sur la liste filtrée.'); } renderGlobalClients(); }
+function deleteSelectedClients(){ if(!selectedClients.length){ toast('Aucun client sélectionné.'); return; } if(!confirm(`Supprimer ${selectedClients.length} client(s) sélectionné(s) ?`)) return; let removed = 0; salons.forEach(s => { const before = (s.visitors || []).length; s.visitors = (s.visitors || []).filter(v => !selectedClients.includes(`${s.id}::${v.id}`)); removed += before - s.visitors.length; if(before !== s.visitors.length) s.updatedAt = new Date().toISOString(); }); selectedClients = []; toast(removed + ' client(s) supprimé(s).'); renderAll(); }
+function exportSelectedEmailsCSV(){ const rows = getFilteredClientRows().filter(r => selectedClients.includes(`${r.salon.id}::${r.visitor.id}`) && String(r.visitor.email || '').trim()); if(!rows.length){ toast('Aucun mail sélectionné à exporter.'); return; } const emails = [...new Set(rows.map(r => String(r.visitor.email || '').trim()).filter(Boolean))]; const csv='\ufeff' + ['Email', ...emails.map(e => `"${e.replace(/"/g,'""')}"`)].join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='emails_selectionnes.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 150); toast(emails.length + ' mail(s) exporté(s).'); }
+
+function getProRows(){
+  const q=(document.getElementById('proSearch')?.value || '').toLowerCase();
+  const selectedSalonId=(document.getElementById('p_salonId')?.value || activeId || '');
+  const rows=[];
+  salons.forEach(s => ((s.prospectsPro || []).forEach(p => rows.push({salon:s, pro:p}))));
+  return rows.filter(r => {
+    const matchSalon = !selectedSalonId || r.salon.id===selectedSalonId;
+    const matchQ = !q || [r.pro.type,r.pro.entreprise,r.pro.prenom,r.pro.nom,r.pro.ville,r.pro.email,r.pro.tel,r.pro.volume,r.pro.notes,r.salon.nom].join(' ').toLowerCase().includes(q);
+    return matchSalon && matchQ;
+  });
+}
+function linkProToActiveSalon(){
+  if(!activeId) return;
+  const el=document.getElementById('p_salonId');
+  if(el) el.value = activeId;
+  renderProList();
+  toast('Onglet Pro relié au salon sélectionné.');
+}
+function resetProForm(){
+  const form=document.getElementById('proForm');
+  if(form) form.reset();
+  document.getElementById('p_id').value='';
+  document.getElementById('p_oldSalonId').value='';
+  renderSalonOptions();
+  if(activeId && document.getElementById('p_salonId')) document.getElementById('p_salonId').value = activeId;
+  renderProList();
+}
+function savePro(){
+  const oldSalonId=document.getElementById('p_oldSalonId').value;
+  const targetSalonId=document.getElementById('p_salonId').value;
+  const resolvedTargetSalonId = targetSalonId==='__other__' ? '__other_pro__' : targetSalonId;
+  const sourceSalon=salons.find(s => s.id===oldSalonId) || salons.find(s => s.id===resolvedTargetSalonId);
+  const targetSalon=resolvedTargetSalonId==='__other_pro__' ? ensureOtherProSalon() : salons.find(s => s.id===resolvedTargetSalonId);
+  if(!targetSalon){ toast('Choisis un salon.'); return; }
+  const id=document.getElementById('p_id').value || uid();
+  const existing=(sourceSalon?.prospectsPro || []).find(x => x.id===id);
+  const obj={
+    id,
+    type: document.getElementById('p_type').value,
+    entreprise: document.getElementById('p_entreprise').value.trim(),
+    prenom: document.getElementById('p_prenom').value.trim(),
+    nom: document.getElementById('p_nom').value.trim(),
+    ville: document.getElementById('p_ville').value.trim(),
+    email: document.getElementById('p_email').value.trim(),
+    tel: document.getElementById('p_tel').value.trim(),
+    potentiel: document.getElementById('p_potentiel').value,
+    suivi: document.getElementById('p_suivi').value,
+    volume: document.getElementById('p_volume').value.trim(),
+    notes: document.getElementById('p_notes').value.trim(),
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  if(!obj.entreprise){ toast('Entreprise requise.'); return; }
+  salons.forEach(s => { s.prospectsPro = (s.prospectsPro || []).filter(p => p.id !== id); });
+  targetSalon.prospectsPro = targetSalon.prospectsPro || [];
+  targetSalon.prospectsPro.unshift(obj);
+  targetSalon.updatedAt = new Date().toISOString();
+  activeId = targetSalon.id;
+  resetProForm();
+  if(document.getElementById('p_salonId')) document.getElementById('p_salonId').value = targetSalon.id==='__other_pro__' ? '__other__' : targetSalon.id;
+  toast(existing ? 'Prospect pro mis à jour.' : 'Prospect pro ajouté.');
+  renderAll();
+}
+function editPro(salonId, proId){
+  const salon=salons.find(s => s.id===salonId);
+  const pro=(salon?.prospectsPro || []).find(p => p.id===proId);
+  if(!salon || !pro) return;
+  activeId = salon.id;
+  appView='pro';
+  document.getElementById('p_id').value=pro.id;
+  document.getElementById('p_oldSalonId').value=salon.id;
+  renderSalonOptions();
+  document.getElementById('p_salonId').value=salon.id==='__other_pro__' ? '__other__' : salon.id;
+  document.getElementById('p_type').value=pro.type || 'caviste';
+  document.getElementById('p_entreprise').value=pro.entreprise || '';
+  document.getElementById('p_prenom').value=pro.prenom || '';
+  document.getElementById('p_nom').value=pro.nom || '';
+  document.getElementById('p_ville').value=pro.ville || '';
+  document.getElementById('p_email').value=pro.email || '';
+  document.getElementById('p_tel').value=pro.tel || '';
+  document.getElementById('p_potentiel').value=pro.potentiel || 'chaud';
+  document.getElementById('p_suivi').value=pro.suivi || 'nouveau';
+  document.getElementById('p_volume').value=pro.volume || '';
+  document.getElementById('p_notes').value=pro.notes || '';
+  renderProList();
+  updateAppView();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function deletePro(salonId, proId){
+  const salon=salons.find(s => s.id===salonId);
+  const pro=(salon?.prospectsPro || []).find(p => p.id===proId);
+  if(!salon || !pro) return;
+  if(!confirm(`Supprimer « ${pro.entreprise} » ?`)) return;
+  salon.prospectsPro = (salon.prospectsPro || []).filter(p => p.id !== proId);
+  salon.updatedAt = new Date().toISOString();
+  toast('Prospect pro supprimé.');
+  renderAll();
+}
+function exportProCSV(){
+  const rows=getProRows();
+  if(!rows.length){ toast('Aucun prospect pro à exporter.'); return; }
+  const headers=['Salon','Type','Entreprise','Prénom','Nom','Ville','Email','Téléphone','Potentiel','Suivi','Potentiel volume','Notes'];
+  const csvRows = rows.map(({salon,pro}) => [salon.nom,pro.type,pro.entreprise,pro.prenom || '',pro.nom || '',pro.ville || '',pro.email || '',pro.tel || '',potentielLabel(pro.potentiel),pro.suivi || '',pro.volume || '',pro.notes || ''].map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(';'));
+  const csv='\ufeff' + [headers.join(';'), ...csvRows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='prospects_pro.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 150);
+  toast(rows.length + ' prospect(s) exporté(s).');
+}
+function renderProList(){
+  const root=document.getElementById('proList');
+  if(!root) return;
+  const rows=getProRows();
+  if(!rows.length){
+    root.innerHTML='<div class="empty">Aucun prospect pro enregistré pour ce salon.</div>';
+    return;
+  }
+  root.innerHTML = rows.map(({salon,pro}) => `<div class="pro-item"><div class="pro-top"><div><div class="pro-company">${escapeHtml(pro.entreprise || 'Sans nom')}</div><div class="pro-contact">${escapeHtml(((pro.prenom || '') + ' ' + (pro.nom || '')).trim() || 'Contact à compléter')} · ${escapeHtml(({'caviste':'Caviste','restaurant':'Restaurant','comite':'Comité d\'entreprise','autre':'Autre'})[pro.type] || pro.type || '—')}</div></div><span class="status pt-${pro.potentiel || 'tiede'}">${potentielLabel(pro.potentiel || 'tiede')}</span></div><div class="visitor-badges" style="margin-top:10px"><span class="status st-nouveau">Salon : ${escapeHtml(salon.nom)}</span>${salon.region ? `<span class="status st-confirme">${escapeHtml(salon.region)}</span>` : ''}${pro.ville ? `<span class="status st-confirme">${escapeHtml(pro.ville)}</span>` : ''}${pro.suivi ? `<span class="status st-a_relancer">${escapeHtml(pro.suivi)}</span>` : ''}</div><div class="visitor-notes" style="margin-top:10px">${pro.email ? `✉ ${escapeHtml(pro.email)}<br>` : ''}${pro.tel ? `☎ ${escapeHtml(pro.tel)}<br>` : ''}${pro.volume ? `📦 ${escapeHtml(pro.volume)}` : ''}</div>${pro.notes ? `<div class="visitor-notes">${escapeHtml(pro.notes)}</div>` : ''}<div class="visitor-actions"><button class="btn-soft btn-sm" onclick="editPro('${salon.id}','${pro.id}')">Modifier</button><button class="btn-danger btn-sm" onclick="deletePro('${salon.id}','${pro.id}')">Supprimer</button></div></div>`).join('');
+}
+function deleteCurrentSalon(){
+  if(!activeId){ toast('Aucun salon sélectionné.'); return; }
+  deleteSalon(activeId);
+}
+function openNewSalonTab(){
+  appView='salons';
+  updateAppView();
+  openSalonEditor();
+}
+
+function getAllProRows(){
+  const q=(document.getElementById('proListSearch')?.value || '').toLowerCase();
+  const rows=[];
+  salons.forEach(s => ((s.prospectsPro || []).forEach(p => rows.push({salon:s, pro:p}))));
+  return rows.filter(r => !q || [r.pro.type,r.pro.entreprise,r.pro.prenom,r.pro.nom,r.pro.ville,r.pro.email,r.pro.tel,r.pro.volume,r.pro.notes,r.salon.nom].join(' ').toLowerCase().includes(q));
+}
+function renderProClientList(){
+  const root=document.getElementById('proClientList');
+  if(!root) return;
+  const rows=getAllProRows();
+  if(!rows.length){
+    root.innerHTML='<div class="empty">Aucun client pro enregistré.</div>';
+    return;
+  }
+  root.innerHTML = rows.map(({salon,pro}) => `<div class="pro-item"><div class="pro-top"><div><div class="pro-company">${escapeHtml(pro.entreprise || 'Sans nom')}</div><div class="pro-contact">${escapeHtml(((pro.prenom || '') + ' ' + (pro.nom || '')).trim() || 'Contact à compléter')} · ${escapeHtml(({'caviste':'Caviste','restaurant':'Restaurant','comite':'Comité d\'entreprise','autre':'Autre'})[pro.type] || pro.type || '—')}</div></div><span class="status pt-${pro.potentiel || 'tiede'}">${potentielLabel(pro.potentiel || 'tiede')}</span></div><div class="visitor-badges" style="margin-top:10px"><span class="status st-nouveau">Salon : ${escapeHtml(salon.nom)}</span>${salon.region ? `<span class="status st-confirme">${escapeHtml(salon.region)}</span>` : ''}${pro.ville ? `<span class="status st-confirme">${escapeHtml(pro.ville)}</span>` : ''}${pro.suivi ? `<span class="status st-a_relancer">${escapeHtml(pro.suivi)}</span>` : ''}</div><div class="visitor-notes" style="margin-top:10px">${pro.email ? `✉ ${escapeHtml(pro.email)}<br>` : ''}${pro.tel ? `☎ ${escapeHtml(pro.tel)}<br>` : ''}${pro.volume ? `📦 ${escapeHtml(pro.volume)}` : ''}</div>${pro.notes ? `<div class="visitor-notes">${escapeHtml(pro.notes)}</div>` : ''}<div class="visitor-actions"><button class="btn-soft btn-sm" onclick="editPro('${salon.id}','${pro.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="setAppView('pro'); document.getElementById('p_salonId').value='${salon.id}'; renderProList();">Voir dans Pro</button></div></div>`).join('');
+}
+
+function renderAll(){ renderYearFilter(); renderHero(); renderDashboard(); renderCards(); renderDetail(); renderActionList(); renderSalonOptions(); renderGlobalClients(); renderProList(); renderProClientList(); updateAppView(); saveData(); }
+function selectSalon(id){ activeId = id; visitorSearch=''; const proSalon=document.getElementById('p_salonId'); if(proSalon && !document.getElementById('p_id')?.value) proSalon.value = id; appView='salons'; document.body.classList.add('ipad-mode');
+renderAll(); }
+function setDetailTab(tab){ detailTab = tab; renderDetail(); }
+function updateVisitorSearch(v){ visitorSearch = v || ''; renderDetail(); }
+function setAppView(view){ appView = view; updateAppView(); }
+function updateAppView(){ const dashboardView=document.getElementById('viewDashboard'); const salonsView=document.getElementById('viewSalons'); const salonsFilters=document.getElementById('viewSalonsFilters'); const newSalonView=document.getElementById('viewNewSalon'); const clientsView=document.getElementById('viewClients'); const clientListView=document.getElementById('viewClientList'); const proView=document.getElementById('viewPro'); const proListView=document.getElementById('viewProList'); const t0=document.getElementById('appTabDashboard'); const t1=document.getElementById('appTabSalons'); const tNew=document.getElementById('appTabNewSalon'); const t2=document.getElementById('appTabClients'); const t3=document.getElementById('appTabClientList'); const t4=document.getElementById('appTabPro'); const t5=document.getElementById('appTabProList'); if(!dashboardView || !salonsView || !salonsFilters || !newSalonView || !clientsView || !clientListView || !proView || !proListView) return; dashboardView.classList.toggle('hidden', appView!=='dashboard'); salonsFilters.classList.toggle('hidden', appView!=='salons'); salonsView.classList.toggle('hidden', appView!=='salons'); newSalonView.classList.toggle('hidden', true); clientsView.classList.toggle('hidden', appView!=='clients'); clientListView.classList.toggle('hidden', appView!=='clientList'); proView.classList.toggle('hidden', appView!=='pro'); proListView.classList.toggle('hidden', appView!=='proList'); t0.classList.toggle('active', appView==='dashboard'); t1.classList.toggle('active', appView==='salons'); if(tNew) tNew.classList.toggle('active', false); t2.classList.toggle('active', appView==='clients'); t3.classList.toggle('active', appView==='clientList'); t4.classList.toggle('active', appView==='pro'); t5.classList.toggle('active', appView==='proList'); }
+function resetGlobalClientForm(){ const form=document.getElementById('globalClientForm'); if(form) form.reset(); renderSalonOptions(); }
+function saveGlobalClient(){
+  const salonId=document.getElementById('gc_salonId').value;
+  const salon=salons.find(s=>s.id===salonId);
+  if(!salon){ toast('Choisis un salon.'); return; }
+  const obj={
+    id: uid(),
+    prenom: document.getElementById('gc_prenom').value.trim(),
+    nom: document.getElementById('gc_nom').value.trim(),
+    ville: document.getElementById('gc_ville').value.trim(),
+    adresse: document.getElementById('gc_adresse').value.trim(),
+    email: document.getElementById('gc_email').value.trim(),
+    tel: document.getElementById('gc_tel').value.trim(),
+    potentiel: 'tiede',
+    suivi: 'nouveau',
+    montant: 0,
+    relance: '',
+    cuvees: '',
+    newsletter: 'non',
+    caveau: 'non',
+    notes: document.getElementById('gc_notes').value.trim(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  if(!obj.prenom || !obj.nom){ toast('Prénom et nom requis.'); return; }
+  salon.visitors = salon.visitors || [];
+  salon.visitors.unshift(obj);
+  salon.updatedAt = new Date().toISOString();
+  activeId = salon.id;
+  resetGlobalClientForm();
+  toast('Informations envoyées et reliées au salon.');
+  renderAll();
+}
+
+function openSalonEditor(id=null){ const s = salons.find(x=>x.id===id); document.getElementById('salonModalTitle').textContent = s ? 'Modifier le salon' : 'Nouveau salon'; document.getElementById('f_id').value = s?.id || ''; document.getElementById('f_nom').value = s?.nom || ''; document.getElementById('f_dateDebut').value = s?.dateDebut || ''; document.getElementById('f_dateFin').value = s?.dateFin || ''; document.getElementById('f_ville').value = s?.ville || ''; document.getElementById('f_region').value = s?.region || ''; document.getElementById('f_statut').value = s?.statut || 'contacter'; document.getElementById('f_type').value = s?.type || 'grand_public'; document.getElementById('f_organisateur').value = s?.organisateur || ''; document.getElementById('f_surface').value = s?.surface || ''; document.getElementById('f_stockCuvees').value = s?.stockCuvees || (s?.stockPris ? ('Stock total ; ' + s.stockPris) : ''); document.getElementById('f_siteWeb').value = s?.siteWeb || ''; document.getElementById('f_vins').value = s?.vins || ''; document.getElementById('f_costStand').value = s?.costStand || ''; document.getElementById('f_costTravel').value = s?.costTravel || ''; document.getElementById('f_costLodging').value = s?.costLodging || ''; document.getElementById('f_costSamples').value = s?.costSamples || ''; document.getElementById('f_costOther').value = s?.costOther || ''; document.getElementById('f_salesOnsite').value = s?.salesOnsite || ''; document.getElementById('f_salesAfter').value = s?.salesAfter || ''; document.getElementById('f_interesses').value = s?.interesses || ''; document.getElementById('f_acheteurs').value = s?.acheteurs || ''; document.getElementById('f_newsletter').value = s?.newsletter || ''; document.getElementById('f_relances').value = s?.relances || ''; document.getElementById('f_relanceLevel').value = s?.relanceLevel || 'aucune'; document.getElementById('f_nextAction').value = s?.nextAction || ''; document.getElementById('f_notes').value = s?.notes || ''; updateBudgetPreview(); document.getElementById('salonModal').classList.add('open'); }
+function closeSalonEditor(){ document.getElementById('salonModal').classList.remove('open'); }
+function updateBudgetPreview(){ const total = n(document.getElementById('f_costStand').value)+n(document.getElementById('f_costTravel').value)+n(document.getElementById('f_costLodging').value)+n(document.getElementById('f_costSamples').value)+n(document.getElementById('f_costOther').value); document.getElementById('f_budgetTotal').value = euro(total); }
+['f_costStand','f_costTravel','f_costLodging','f_costSamples','f_costOther'].forEach(id => setTimeout(()=>{const el=document.getElementById(id); if(el) el.addEventListener('input', updateBudgetPreview);},0));
+function saveSalon(){ const id = document.getElementById('f_id').value || uid(); const existing = salons.find(s=>s.id===id); const obj = { id, nom: document.getElementById('f_nom').value.trim(), dateDebut: document.getElementById('f_dateDebut').value, dateFin: document.getElementById('f_dateFin').value, ville: document.getElementById('f_ville').value.trim(), region: document.getElementById('f_region').value.trim(), statut: document.getElementById('f_statut').value, type: document.getElementById('f_type').value, organisateur: document.getElementById('f_organisateur').value.trim(), surface: n(document.getElementById('f_surface').value), stockCuvees: document.getElementById('f_stockCuvees').value.trim(), stockPris: totalStockFromText(document.getElementById('f_stockCuvees').value), siteWeb: document.getElementById('f_siteWeb').value.trim(), vins: document.getElementById('f_vins').value.trim(), notes: document.getElementById('f_notes').value.trim(), costStand: n(document.getElementById('f_costStand').value), costTravel: n(document.getElementById('f_costTravel').value), costLodging: n(document.getElementById('f_costLodging').value), costSamples: n(document.getElementById('f_costSamples').value), costOther: n(document.getElementById('f_costOther').value), salesOnsite: n(document.getElementById('f_salesOnsite').value), salesAfter: n(document.getElementById('f_salesAfter').value), interesses: n(document.getElementById('f_interesses').value), acheteurs: n(document.getElementById('f_acheteurs').value), newsletter: n(document.getElementById('f_newsletter').value), relances: n(document.getElementById('f_relances').value), relanceLevel: document.getElementById('f_relanceLevel').value, nextAction: document.getElementById('f_nextAction').value.trim(), tasks: existing?.tasks || [], visitors: existing?.visitors || [], prospectsPro: existing?.prospectsPro || [], stockVendus: existing?.stockVendus || '', createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+  if(!obj.nom || !obj.dateDebut){ toast('Nom et date de début requis.'); return; }
+  salons = existing ? salons.map(s => s.id===id ? obj : s) : [obj, ...salons]; activeId = id; closeSalonEditor(); toast(existing ? 'Salon mis à jour.' : 'Salon ajouté.'); renderAll(); }
+function deleteSalon(id){ const s = salons.find(x=>x.id===id); if(!s) return; if(!confirm(`Supprimer « ${s.nom} » ?`)) return; salons = salons.filter(x=>x.id!==id); activeId = salons[0]?.id || null; toast('Salon supprimé.'); renderAll(); }
+function duplicateSalon(id){ const s = salons.find(x=>x.id===id); if(!s) return; const copy = JSON.parse(JSON.stringify(s)); copy.id=uid(); copy.nom=s.nom+' (copie)'; copy.tasks=(s.tasks||[]).map(t=>({...t,id:uid()})); copy.visitors=(s.visitors||[]).map(v=>({...v,id:uid()})); copy.createdAt=new Date().toISOString(); copy.updatedAt=new Date().toISOString(); salons.unshift(copy); activeId=copy.id; toast('Salon dupliqué.'); renderAll(); }
+function duplicateCurrent(){ if(activeId) duplicateSalon(activeId); }
+
+function openVisitorEditor(visitorId=null){ const salon = activeSalon(); if(!salon) return; const v = (salon.visitors||[]).find(x=>x.id===visitorId); document.getElementById('visitorModalTitle').textContent = v ? 'Modifier le visiteur' : 'Nouveau visiteur'; document.getElementById('v_salonId').value = salon.id; document.getElementById('v_id').value = v?.id || ''; document.getElementById('v_nom').value = v?.nom || ''; document.getElementById('v_ville').value = v?.ville || ''; document.getElementById('v_email').value = v?.email || ''; document.getElementById('v_tel').value = v?.tel || ''; document.getElementById('v_potentiel').value = v?.potentiel || 'chaud'; document.getElementById('v_suivi').value = v?.suivi || 'nouveau'; document.getElementById('v_montant').value = v?.montant || ''; document.getElementById('v_relance').value = v?.relance || ''; document.getElementById('v_cuvees').value = v?.cuvees || ''; document.getElementById('v_newsletter').value = v?.newsletter || 'oui'; document.getElementById('v_caveau').value = v?.caveau || 'non'; document.getElementById('v_notes').value = v?.notes || ''; document.getElementById('visitorModal').classList.add('open'); }
+function closeVisitorEditor(){ document.getElementById('visitorModal').classList.remove('open'); }
+function saveVisitor(){ const sourceSalon = salons.find(s => s.id === document.getElementById('v_salonId').value) || activeSalon(); if(!sourceSalon) return; const targetSalonId = document.getElementById('v_salonSelect').value || sourceSalon.id; const targetSalon = salons.find(s => s.id === targetSalonId) || sourceSalon; const id = document.getElementById('v_id').value || uid(); const existing = (sourceSalon.visitors||[]).find(x=>x.id===id); const obj = { id, prenom: document.getElementById('v_prenom').value.trim(), nom: document.getElementById('v_nom').value.trim(), ville: document.getElementById('v_ville').value.trim(), email: document.getElementById('v_email').value.trim(), tel: document.getElementById('v_tel').value.trim(), adresse: document.getElementById('v_adresse').value.trim(), potentiel: document.getElementById('v_potentiel').value, suivi: document.getElementById('v_suivi').value, montant: n(document.getElementById('v_montant').value), relance: document.getElementById('v_relance').value, cuvees: document.getElementById('v_cuvees').value.trim(), newsletter: document.getElementById('v_newsletter').value, caveau: document.getElementById('v_caveau').value, notes: document.getElementById('v_notes').value.trim(), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+  if(!obj.nom){ toast('Nom du visiteur requis.'); return; } sourceSalon.visitors = (sourceSalon.visitors || []).filter(v => v.id !== id); targetSalon.visitors = targetSalon.visitors || []; const targetExisting = (targetSalon.visitors||[]).find(v => v.id===id); targetSalon.visitors = targetExisting ? targetSalon.visitors.map(v => v.id===id ? obj : v) : [obj, ...targetSalon.visitors]; sourceSalon.updatedAt = new Date().toISOString(); targetSalon.updatedAt = new Date().toISOString(); activeId = targetSalon.id; closeVisitorEditor(); toast(existing ? 'Client mis à jour.' : 'Client ajouté au salon.'); detailTab='visitors'; renderAll(); }
+function deleteVisitor(visitorId){ const salon = activeSalon(); if(!salon) return; const v = (salon.visitors||[]).find(x=>x.id===visitorId); if(!v) return; if(!confirm(`Supprimer « ${v.nom} » ?`)) return; salon.visitors = (salon.visitors||[]).filter(x=>x.id!==visitorId); salon.updatedAt=new Date().toISOString(); toast('Visiteur supprimé.'); detailTab='visitors'; renderAll(); }
+function exportCurrentVisitorsCSV(){ const salon = activeSalon(); if(!salon) return; const visitors = salon.visitors || []; const headers = ['Salon','Nom','Ville','Email','Téléphone','Intérêt','Suivi','Montant','Relance','Cuvées appréciées','Newsletter','Visite caveau','Notes']; const rows = visitors.map(v => [salon.nom,v.nom,v.ville,v.email,v.tel,potentielLabel(v.potentiel),suiviLabel(v.suivi),v.montant,v.relance,v.cuvees,v.newsletter,v.caveau,v.notes].map(x => `"${String(x ?? '').replace(/"/g,'""')}"`).join(';')); const csv='\ufeff' + [headers.join(';'), ...rows].join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=slugify(salon.nom)+'_visiteurs.csv'; a.click(); }
+
+function addTask(){ const salon = activeSalon(); const input = document.getElementById('taskInput'); const text = input?.value.trim(); if(!salon || !text) return; salon.tasks = salon.tasks || []; salon.tasks.unshift({id:uid(), text, done:false}); salon.updatedAt=new Date().toISOString(); input.value=''; toast('Tâche ajoutée.'); detailTab='tasks'; renderAll(); }
+function toggleTask(taskId){ const salon = activeSalon(); if(!salon) return; salon.tasks=(salon.tasks||[]).map(t => t.id===taskId ? {...t,done:!t.done} : t); salon.updatedAt=new Date().toISOString(); detailTab='tasks'; renderAll(); }
+function removeTask(taskId){ const salon = activeSalon(); if(!salon) return; salon.tasks=(salon.tasks||[]).filter(t => t.id!==taskId); salon.updatedAt=new Date().toISOString(); detailTab='tasks'; renderAll(); }
+
+function triggerImport(){ document.getElementById('importFile').click(); }
+document.getElementById('importFile').addEventListener('change', e => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = ev => { try{ const data = JSON.parse(ev.target.result); if(!Array.isArray(data)) throw new Error('invalid'); if(!confirm(`Importer ${data.length} salon(s) et remplacer les données actuelles ?`)) return; salons=data; activeId=salons[0]?.id || null; toast('Import terminé.'); renderAll(); } catch(err){ toast('Fichier JSON invalide.'); } }; reader.readAsText(file); e.target.value=''; });
+document.getElementById('clientCsvFile').addEventListener('change', e => { const file = e.target.files[0]; if(!file) return; const forcedSalonId = salonCsvTargetId; const reader = new FileReader(); reader.onload = ev => { importClientsCsvText(ev.target.result, forcedSalonId); salonCsvTargetId = null; }; reader.readAsText(file); e.target.value=''; });
+function exportJSON(){ const blob=new Blob([JSON.stringify(salons,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='salons_vins_luxe_particuliers.json'; a.click(); }
+function exportCSV(){ const headers=['Nom','Date début','Date fin','Ville','Région','Statut','Type','Budget total','CA total','Visiteurs intéressés','Acheteurs','Newsletter','Visiteurs saisis','Potentiel visiteurs','Action suivante']; const rows=salons.map(s => [s.nom,s.dateDebut,s.dateFin,s.ville,s.region,statusLabel(s.statut),typeLabel(s.type),totalBudget(s),totalCA(s),s.interesses,s.acheteurs,s.newsletter,totalVisitors(s),totalVisitorPotential(s),s.nextAction].map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(';')); const csv='\ufeff' + [headers.join(';'), ...rows].join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='salons_vins_luxe_particuliers.csv'; a.click(); }
+function printCurrent(){ window.print(); }
+function slugify(s){ return (s||'salon').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''); }
+function escapeHtml(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.getElementById('toasts').appendChild(d); setTimeout(()=>d.remove(),2600); }
+
+document.getElementById('salonModal').addEventListener('click', e => { if(e.target.id==='salonModal') closeSalonEditor(); });
+document.getElementById('visitorModal').addEventListener('click', e => { if(e.target.id==='visitorModal') closeVisitorEditor(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeSalonEditor(); closeVisitorEditor(); } if(e.key.toLowerCase()==='n' && !e.metaKey && !e.ctrlKey && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA') openSalonEditor(); });
+
+renderAll();
+</script>
+</body>
+</html>
