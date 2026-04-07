@@ -89,19 +89,88 @@
   @media (max-width:980px){.hero-grid,.score-grid,.grid2,.cards,.form-grid,.visitor-stats,.stats4{grid-template-columns:1fr}.dashboard{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:680px){.topbar-inner,.container{padding:18px}.dashboard{grid-template-columns:1fr}}
   @media print{.topbar,.filters,.left,.footer-note,.action-row,.detail-tabs,.btns,.hero-side,.visitor-toolbar{display:none!important} body{background:#fff}.container{max-width:none;padding:0}.layout{display:block}.detail{box-shadow:none;border:none;background:#fff;padding:0}}
+.cal-month { background:rgba(255,255,255,0.7); border:1px solid rgba(184,140,69,.18); border-radius:14px; padding:12px; }
+.cal-days-header { display:grid; grid-template-columns:repeat(7, 1fr); text-align:center; font-size:0.75rem; color:var(--muted); font-weight:700; margin-bottom:8px; }
+.cal-grid { display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; text-align:center; }
+.cal-day { padding:6px 0; font-size:0.85rem; border-radius:6px; color:var(--text); }
+.cal-day.active-salon { background:var(--wine); color:white; font-weight:800; cursor:pointer; box-shadow:0 2px 4px rgba(111,33,50,.3); transition:0.2s; }
+.cal-day.active-salon:hover { transform:scale(1.1); }
+
+/* Mode Borne (Plein écran) */
+body.kiosk-mode .topbar { display: none !important; }
+body.kiosk-mode .brand p { display: none !important; }
+body.kiosk-mode .app-tabs { display: none !important; }
+.exit-kiosk-btn { display: none; position: fixed; bottom: 16px; right: 16px; opacity: 0.15; z-index: 9999; transition: 0.3s; }
+body.kiosk-mode .exit-kiosk-btn { display: inline-flex; }
+.exit-kiosk-btn:hover { opacity: 1; }
+
+
+/* Mode Borne (Plein écran) - Masquer l'en-tête du formulaire */
+body.kiosk-mode #viewClients .head { display: none !important; }
+
+
+.brand-badge {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.brand-badge img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain;
+}
+
+
+
+/* Touch targets plus grands pour iPad */
+.input, select, textarea { padding: 14px 16px; font-size: 1.1rem; }
+.btn-primary, .btn-soft, .btn-danger, .tab-btn { padding: 12px 20px; font-size: 1.05rem; }
+.app-tab { padding: 10px 18px; font-size: 1rem; }
+
+/* Overlay de succès (Kiosk) */
+.kiosk-success-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,253,249,0.98); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; text-align: center; border-radius: 24px; }
+.kiosk-success-overlay h2 { font-size: 2.5rem; color: var(--wine); margin:0; }
+.kiosk-success-overlay p { font-size: 1.2rem; color: var(--muted); margin:0; }
+.kiosk-success-overlay button { padding: 20px 40px; font-size: 1.4rem; border-radius: 16px; }
+
+/* Kiosk Objective Banner */
+.objective-banner { background: rgba(45, 99, 70, 0.08); border: 1px solid rgba(45, 99, 70, 0.2); padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;}
+body.kiosk-mode .objective-banner { display: none !important; }
+
+
+/* Mode Soirée (Inversion des couleurs) */
+html.dark-mode { filter: invert(1) hue-rotate(180deg); background-color: #000; min-height: 100vh; }
+html.dark-mode img { filter: invert(1) hue-rotate(180deg); }
+html.dark-mode .kiosk-success-overlay { background: rgba(0,0,0,0.95); }
+html.dark-mode .objective-banner { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+body.dark-mode #qrBox { background: rgba(0,0,0,0.4) !important; border-color: #444 !important; }
 </style>
+
+  <!-- Chart.js pour les graphiques -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- QRCode.js pour le flash code borne -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 </head>
 <body>
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <div class="brand-badge">🍷</div>
+      <div class="brand-badge"><img src="https://static.wixstatic.com/media/d8a807_6802ed710de547078175d17aa1892c2e~mv2.png" alt="Ferme Chabran"></div>
       <div>
         <h1>TM.Vente</h1>
-        <p>Version iPad borne — saisie tactile clients sur salon</p>
       </div>
     </div>
-    <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+    <button class="btn-soft btn-sm" onclick="document.documentElement.classList.toggle('dark-mode')" style="margin-left:auto; padding:8px 12px; font-size:0.9rem;">🌙 Mode soirée</button>
+  </div><input id="importFile" type="file" accept="application/json,.json" class="hidden">
     <input id="clientCsvFile" type="file" accept=".csv,text/csv" class="hidden">
   </div>
 </header>
@@ -109,6 +178,7 @@
 <main class="container">
   <section class="app-tabs">
     <button class="app-tab btn-sm active" id="appTabDashboard" onclick="setAppView('dashboard')">Tableau de bord</button>
+<button class="app-tab btn-sm" id="appTabCalendrier" onclick="setAppView('calendrier')">🗓️ Calendrier</button>
     <button class="app-tab btn-sm" id="appTabSalons" onclick="setAppView('salons')">Salons</button>
     <button class="app-tab btn-sm" id="appTabClients" onclick="setAppView('clients')">Nouveau client</button>
     <button class="app-tab btn-sm" id="appTabClientList" onclick="setAppView('clientList')">Liste clients</button>
@@ -116,7 +186,23 @@
     <button class="app-tab btn-sm" id="appTabProList" onclick="setAppView('proList')">Liste clients pro</button>
   </section>
 
-  <section id="viewDashboard">
+  <section id="viewCalendrier" class="hidden">
+  <div class="panel" style="max-width:1200px; margin:0 auto;">
+    <div class="head" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div>
+        <h3>🗓️ Calendrier Annuel</h3>
+        <p>Vue globale de tes salons sur l'année.</p>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+         <button class="btn-soft btn-sm" onclick="changeCalYear(-1)">◀</button>
+         <h3 id="calYearDisplay" style="margin:0; min-width:60px; text-align:center;">2026</h3>
+         <button class="btn-soft btn-sm" onclick="changeCalYear(1)">▶</button>
+      </div>
+    </div>
+    <div id="calendrierTimeline" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-top:20px;"></div>
+  </div>
+</section>
+<section id="viewDashboard" >
   <section class="hero">
     <div class="hero-card">
       <span class="eyebrow">Salons grand public</span>
@@ -160,6 +246,7 @@
           </div>
           <div class="action-row">
             <button class="btn-primary btn-sm" onclick="openSalonEditor()">+ Nouveau salon</button>
+          <button class="btn-soft btn-sm" onclick="exportJournalCSV()">📊 Exporter Journal Comptable</button>
             <button class="btn-soft btn-sm" onclick="duplicateCurrent()">Dupliquer</button>
             <button class="btn-soft btn-sm" onclick="openSalonEditor(activeId)">Modifier</button>
             <button class="btn-danger btn-sm" onclick="deleteCurrentSalon()">Supprimer</button>
@@ -171,7 +258,17 @@
 
     <div class="right">
       <div class="detail" id="detail"></div>
-      <div class="panel">
+      <div class="grid2" style="margin-top:20px;">
+        <div class="panel">
+          <h4 style="margin-bottom:15px; color:var(--wine)">Répartition du CA Global</h4>
+          <canvas id="chartGamme"></canvas>
+        </div>
+        <div class="panel">
+          <h4 style="margin-bottom:15px; color:var(--wine)">Évolution Mensuelle du CA</h4>
+          <canvas id="chartMois"></canvas>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:20px;">
         <div class="head">
           <div>
             <h3>Actions recommandées</h3>
@@ -205,16 +302,33 @@
 
   <section id="viewClients" class="hidden">
     <div class="panel">
-      <div class="head">
+      <div class="head" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
         <div>
           <h3>Nouvelle fiche client</h3>
           <p>Le client peut remplir lui-même ses informations et les relier au salon concerné.</p>
         </div>
+        <button class="btn-soft btn-sm" type="button" onclick="toggleKioskMode(true)">⛶ Mode Borne (Plein écran)</button>
+      </div>
       </div>
       <div class="sub-block" style="max-width:920px;margin:0 auto">
-        <form id="globalClientForm" onsubmit="event.preventDefault(); saveGlobalClient();">
+        
+        <div id="qrBox" style="text-align:center; padding:15px; background:rgba(255,255,255,0.8); border:1px solid var(--gold); border-radius:14px; margin-bottom:15px;">
+          <h4 style="color:var(--wine); margin:0 0 10px 0;">📱 Coupe-file : Scannez avec votre téléphone</h4>
+          <div id="qrCodeContainer" style="display:flex; justify-content:center; padding:10px; background:white; border-radius:8px; display:inline-block;"></div>
+          <p style="font-size:0.85rem; color:var(--muted); margin-top:10px;">Scannez pour remplir ce formulaire sur votre propre mobile sans attendre.</p>
+        </div>
+        <div id="objectiveBanner" class="objective-banner hidden">
+          <div><strong style="color:var(--wine)">Objectifs du salon :</strong> <span id="objCaText"></span> / <span id="objCartonsText"></span></div>
+          <div style="font-size:0.85rem; color:var(--muted)">Ce bloc est masqué en mode borne</div>
+        </div>
+        <div id="kioskSuccess" class="kiosk-success-overlay hidden">
+          <h2>Merci ! 🍷</h2>
+          <p>Vos informations ont bien été enregistrées.</p>
+          <button class="btn-primary" type="button" onclick="closeKioskSuccess()">Nouveau client suivant</button>
+        </div>
+        <form id="globalClientForm"  onsubmit="event.preventDefault(); saveGlobalClient();">
           <div class="form-grid">
-            <div class="field"><label>Salon</label><select id="gc_salonId"></select></div>
+            <div class="field"><label>Salon</label><select id="gc_salonId" onchange="updateObjectiveBanner()"></select></div>
             <div class="field"><label>Prénom</label><input id="gc_prenom" required placeholder="Votre prénom"></div>
             <div class="field"><label>Nom</label><input id="gc_nom" required placeholder="Votre nom"></div>
             <div class="field"><label>Ville</label><input id="gc_ville" placeholder="Votre ville"></div>
@@ -397,6 +511,10 @@ Rosé ; 12"></textarea></div>
             <div class="form-grid">
               <div class="field"><label>CA sur salon (€)</label><input id="f_salesOnsite" type="number" min="0" step="0.01"></div>
               <div class="field"><label>CA après salon (€)</label><input id="f_salesAfter" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>CA CDR (€)</label><input id="f_caCdr" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>CA CDP (€)</label><input id="f_caCdp" type="number" min="0" step="0.01"></div>
+                            <div class="field"><label>Objectif CA cible (€)</label><input id="f_objCa" type="number" min="0" step="0.01"></div>
+              <div class="field"><label>Objectif Cartons (Qté)</label><input id="f_objCartons" type="number" min="0"></div>
               <div class="field"><label>Visiteurs intéressés</label><input id="f_interesses" type="number" min="0"></div>
               <div class="field"><label>Acheteurs sur place</label><input id="f_acheteurs" type="number" min="0"></div>
               <div class="field"><label>Inscriptions newsletter</label><input id="f_newsletter" type="number" min="0"></div>
@@ -458,7 +576,22 @@ Rosé ; 12"></textarea></div>
               <option value="sans_suite">Sans suite</option>
             </select>
           </div>
-          <div class="field"><label>Montant achat / potentiel (€)</label><input id="v_montant" type="number" min="0" step="0.01"></div>
+          <div class="field full sub-block" style="background:rgba(255,255,255,0.6); padding:15px; border-radius:10px; border:1px solid rgba(184,140,69,0.2);">
+            <h4 style="margin:0 0 10px 0; color:var(--wine);">🛒 Panier Rapide</h4>
+            <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+              <div style="flex:1; min-width:120px;"><label>Bouteilles CDR</label><div style="display:flex; gap:5px;"><button type="button" class="btn-soft" onclick="modQty('v_qtyCdr',-1)">-</button><input id="v_qtyCdr" type="number" min="0" value="0" style="width:60px; text-align:center" oninput="calcCart()"><button type="button" class="btn-soft" onclick="modQty('v_qtyCdr',1)">+</button></div></div>
+              <div style="width:80px;"><label>Prix Unité</label><input id="v_pxCdr" type="number" value="15" step="0.5" oninput="calcCart()"></div>
+            </div>
+            <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap; margin-top:10px;">
+              <div style="flex:1; min-width:120px;"><label>Bouteilles CDP</label><div style="display:flex; gap:5px;"><button type="button" class="btn-soft" onclick="modQty('v_qtyCdp',-1)">-</button><input id="v_qtyCdp" type="number" min="0" value="0" style="width:60px; text-align:center" oninput="calcCart()"><button type="button" class="btn-soft" onclick="modQty('v_qtyCdp',1)">+</button></div></div>
+              <div style="width:80px;"><label>Prix Unité</label><input id="v_pxCdp" type="number" value="35" step="0.5" oninput="calcCart()"></div>
+            </div>
+            <div style="margin-top:15px; border-top:1px dashed rgba(184,140,69,0.3); padding-top:10px; display:flex; align-items:center; justify-content:space-between;">
+               <strong>Total calculé : <span id="cartTotalDisplay">0</span> €</strong>
+               <button type="button" class="btn-primary btn-sm" onclick="applyCart()">Appliquer au Montant</button>
+            </div>
+          </div>
+          <div class="field"><label>Montant achat final (€)</label><input id="v_montant" type="number" min="0" step="0.01"></div>
           <div class="field"><label>Prochaine relance</label><input id="v_relance" type="date"></div>
           <div class="field full"><label>Cuvées appréciées</label><input id="v_cuvees"></div>
           <div class="field"><label>Inscrit newsletter</label>
@@ -539,6 +672,8 @@ function sampleVisitor(prenom, nom, ville, suivi, potentiel, montant, cuvees, no
   return {id: uid(), prenom, nom, ville, email:'', tel:'', adresse, potentiel, suivi, montant, relance:'', cuvees, newsletter, caveau, notes, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
 }
 const defaultSalons = [
+
+  { id: uid(), nom: 'Salon des Vins de Genas', dateDebut: '2025-03-21', dateFin: '2025-03-23', ville: 'Genas', region: 'Auvergne-Rhône-Alpes', statut: 'termine', type: 'grandpublic', organisateur: 'Comité du salon', siteWeb: '', surface: 12, vins: 'Rouge domaine, Rosé, Cuvée Prestige', notes: 'Édition précédente', costStand: 700, costTravel: 150, costLodging: 0, costSamples: 150, costOther: 80, salesOnsite: 3100, salesAfter: 800, interesses: 30, acheteurs: 14, newsletter: 10, relances: 5, relanceLevel: 'faite', nextAction: '', tasks: [], visitors: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   {
     id: uid(), nom:'Salon des Vins de Genas', dateDebut:'2026-03-21', dateFin:'2026-03-23', ville:'Genas', region:'Auvergne-Rhône-Alpes', statut:'termine', type:'grand_public', organisateur:'Comité du salon', siteWeb:'', surface:12,
     vins:'Rouge domaine, Rosé, Cuvée Prestige', notes:'Salon rentable en vente directe. Bonne ambiance, trafic régulier et plusieurs visiteurs intéressés par un retour au domaine.',
@@ -657,14 +792,27 @@ function renderDetail(){
   const budget = totalBudget(s), ca = totalCA(s), visitorsCount = totalVisitors(s), r = roi(s), conv = conversion(s); const winesHtml = wines(s).length ? wines(s).map(x=>`<span class="pill">${x}</span>`).join('') : '<span class="pill">Aucune cuvée</span>';
   root.innerHTML = `
     <div class="detail-top"><div><span class="status st-${s.statut}">${statusLabel(s.statut)}</span><h3>${s.nom}</h3><p>${s.ville || 'Ville à préciser'}${s.region ? ' · ' + s.region : ''} · ${dateFr(s.dateDebut)}${s.dateFin ? ' au ' + dateFr(s.dateFin) : ''} · ${days(s.dateDebut,s.dateFin)} jour(s)</p></div><div class="action-row"><button class="btn-soft btn-sm" onclick="openSalonEditor('${s.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="duplicateSalon('${s.id}')">Dupliquer</button><button class="btn-soft btn-sm" onclick="triggerSalonCsvImport('${s.id}')">Importer CSV</button><button class="btn-danger btn-sm" onclick="deleteSalon('${s.id}')">Supprimer</button></div></div>
-    <div class="score-grid"><div class="score"><div class="sl">Rentabilité</div><div class="sv">${profitabilityText(s)}</div></div><div class="score"><div class="sl">ROI</div><div class="sv">${percent(r)}</div></div><div class="score"><div class="sl">Conversion</div><div class="sv">${percent(conv)}</div></div><div class="score"><div class="sl">Visiteurs</div><div class="sv">${integer(visitorsCount)}</div></div><div class="score"><div class="sl">Stock total</div><div class="sv">${integer(totalStockFromText(s.stockCuvees) || s.stockPris || 0)}</div></div><div class="score"><div class="sl">Potentiel</div><div class="sv">${euro(totalVisitorPotential(s))}</div></div></div>
+    <div class="score-grid"><div class="score"><div class="sl">Rentabilité</div><div class="sv">${profitabilityText(s)}</div></div><div class="score"><div class="sl">ROI</div><div class="sv">${percent(r)}</div></div><div class="score"><div class="sl">Conversion</div><div class="sv">${percent(conv)}</div></div><div class="score"><div class="sl">Visiteurs</div><div class="sv">${integer(visitorsCount)}</div></div><div class="score"><div class="sl">Stock total</div><div class="sv">${integer(totalStockFromText(s.stockCuvees) || s.stockPris || 0)}</div></div></div>
     <div class="detail-tabs"><button class="tab-btn btn-sm ${detailTab==='overview'?'active':''}" onclick="setDetailTab('overview')">Vue générale</button><button class="tab-btn btn-sm ${detailTab==='finance'?'active':''}" onclick="setDetailTab('finance')">Budget & CA</button><button class="tab-btn btn-sm ${detailTab==='public'?'active':''}" onclick="setDetailTab('public')">Public & ventes</button><button class="tab-btn btn-sm ${detailTab==='stock'?'active':''}" onclick="setDetailTab('stock')">Stock salon</button><button class="tab-btn btn-sm ${detailTab==='visitors'?'active':''}" onclick="setDetailTab('visitors')">Liste visiteurs</button><button class="tab-btn btn-sm ${detailTab==='tasks'?'active':''}" onclick="setDetailTab('tasks')">Checklist</button><button class="tab-btn btn-sm ${detailTab==='notes'?'active':''}" onclick="setDetailTab('notes')">Notes & cuvées</button></div>
 
-    <div class="tab-pane ${detailTab==='overview'?'active':''}"><div class="grid2"><div class="info"><h5>Identité du salon</h5><div class="row"><span class="k">Type</span><span class="v">${typeLabel(s.type)}</span></div><div class="row"><span class="k">Organisateur</span><span class="v">${s.organisateur || '—'}</span></div><div class="row"><span class="k">Surface stand</span><span class="v">${s.surface ? s.surface + ' m²' : '—'}</span></div><div class="row"><span class="k">Stock total</span><span class="v">${integer(totalStockFromText(s.stockCuvees) || s.stockPris || 0)}</span></div><div class="row"><span class="k">Vendu</span><span class="v">${integer(totalSold(s))}</span></div><div class="row"><span class="k">Restant</span><span class="v">${integer(totalRemaining(s))}</span></div><div class="row"><span class="k">Site web</span><span class="v">${s.siteWeb ? `<a href="${s.siteWeb}" target="_blank" style="color:var(--wine)">ouvrir</a>` : '—'}</span></div></div><div class="info"><h5>Résumé grand public</h5><div class="row"><span class="k">Budget total</span><span class="v">${euro(budget)}</span></div><div class="row"><span class="k">CA total</span><span class="v">${euro(ca)}</span></div><div class="row"><span class="k">Visiteurs intéressés</span><span class="v">${integer(s.interesses)}</span></div><div class="row"><span class="k">Acheteurs</span><span class="v">${integer(s.acheteurs)}</span></div></div></div><div class="note-box" style="margin-top:14px"><h5>Prochaine action</h5><p>${s.nextAction || 'Aucune action définie.'}</p></div></div>
+    <div class="tab-pane ${detailTab==='overview'?'active':''}"><div class="grid2"><div class="info"><h5>Identité du salon</h5><div class="row"><span class="k">Type</span><span class="v">${typeLabel(s.type)}</span></div><div class="row"><span class="k">Organisateur</span><span class="v">${s.organisateur || '—'}</span></div><div class="row"><span class="k">Surface stand</span><span class="v">${s.surface ? s.surface + ' m²' : '—'}</span></div><div class="row"><span class="k">Stock total</span><span class="v">${integer(totalStockFromText(s.stockCuvees) || s.stockPris || 0)}</span></div><div class="row"><span class="k">Vendu</span><span class="v">${integer(totalSold(s))}</span></div><div class="row"><span class="k">Restant</span><span class="v">${integer(totalRemaining(s))}</span></div><div class="row"><span class="k">Site web</span><span class="v">${s.siteWeb ? `<a href="${s.siteWeb}" target="_blank" style="color:var(--wine)">ouvrir</a>` : '—'}</span></div></div><div class="info"><h5>Résumé grand public</h5><div class="row"><span class="k">Budget total</span><span class="v">${euro(budget)}</span></div><div class="row"><span class="k">CA total</span><span class="v">${euro(ca)}</span></div>
+<div class="row" style="margin-top:10px; border-top:1px dashed rgba(184,140,69,0.2); padding-top:10px;"><span class="k">Détail par gamme :</span></div>
+<div class="row"><span class="k">— Côtes du Rhône (CDR)</span><span class="v">${euro(s.caCdr||0)}</span></div>
+<div class="row"><span class="k">— Châteauneuf-du-Pape (CDP)</span><span class="v">${euro(s.caCdp||0)}</span></div>
+<div class="row" style="margin-top:10px; border-top:1px dashed rgba(184,140,69,0.2); padding-top:10px;"><span class="k">Objectifs de base :</span></div>
+<div class="row"><span class="k">— CA Cible</span><span class="v">${euro(s.objCa||0)}</span></div>
+<div class="row"><span class="k">— Cartons à écouler</span><span class="v">${s.objCartons||0}</span></div><div class="row"><span class="k">Visiteurs intéressés</span><span class="v">${integer(s.interesses)}</span></div><div class="row"><span class="k">Acheteurs</span><span class="v">${integer(s.acheteurs)}</span></div></div></div><div class="note-box" style="margin-top:14px"><h5>Prochaine action</h5><p>${s.nextAction || 'Aucune action définie.'}</p></div>${renderYoY(s)}</div>
 
-    <div class="tab-pane ${detailTab==='finance'?'active':''}"><div class="grid2"><div class="info"><h5>Budget détaillé</h5>${budgetLine('Stand', s.costStand, budget)}${budgetLine('Transport', s.costTravel, budget)}${budgetLine('Hébergement', s.costLodging, budget)}${budgetLine('Échantillons', s.costSamples, budget)}${budgetLine('Autres', s.costOther, budget)}<div class="row"><span class="k">Total budget</span><span class="v">${euro(budget)}</span></div></div><div class="info"><h5>Recettes</h5><div class="row"><span class="k">CA sur salon</span><span class="v">${euro(s.salesOnsite)}</span></div><div class="row"><span class="k">CA après salon</span><span class="v">${euro(s.salesAfter)}</span></div><div class="row"><span class="k">CA total</span><span class="v">${euro(ca)}</span></div><div class="row"><span class="k">Écart CA - budget</span><span class="v">${euro(ca-budget)}</span></div><div class="row"><span class="k">ROI</span><span class="v">${percent(r)}</span></div></div></div></div>
+    <div class="tab-pane ${detailTab==='finance'?'active':''}"><div class="grid2"><div class="info"><h5>Budget détaillé</h5>${budgetLine('Stand', s.costStand, budget)}${budgetLine('Transport', s.costTravel, budget)}${budgetLine('Hébergement', s.costLodging, budget)}${budgetLine('Échantillons', s.costSamples, budget)}${budgetLine('Autres', s.costOther, budget)}<div class="row"><span class="k">Total budget</span><span class="v">${euro(budget)}</span></div></div><div class="info"><h5>Recettes</h5><div class="row"><span class="k">CA sur salon</span><span class="v">${euro(s.salesOnsite)}</span></div><div class="row"><span class="k">CA après salon</span><span class="v">${euro(s.salesAfter)}</span></div><div class="row"><span class="k">CA total</span><span class="v">${euro(ca)}</span></div>
+<div class="row" style="margin-top:10px; border-top:1px dashed rgba(184,140,69,0.2); padding-top:10px;"><span class="k">Détail par gamme :</span></div>
+<div class="row"><span class="k">— Côtes du Rhône (CDR)</span><span class="v">${euro(s.caCdr||0)}</span></div>
+<div class="row"><span class="k">— Châteauneuf-du-Pape (CDP)</span><span class="v">${euro(s.caCdp||0)}</span></div>
+<div class="row" style="margin-top:10px; border-top:1px dashed rgba(184,140,69,0.2); padding-top:10px;"><span class="k">Objectifs de base :</span></div>
+<div class="row"><span class="k">— CA Cible</span><span class="v">${euro(s.objCa||0)}</span></div>
+<div class="row"><span class="k">— Cartons à écouler</span><span class="v">${s.objCartons||0}</span></div><div class="row"><span class="k">Écart CA - budget</span><span class="v">${euro(ca-budget)}</span></div><div class="row"><span class="k">ROI</span><span class="v">${percent(r)}</span></div></div></div></div>
 
-    <div class="tab-pane ${detailTab==='public'?'active':''}"><div class="grid2"><div class="info"><h5>Public rencontré</h5><div class="row"><span class="k">Visiteurs intéressés</span><span class="v">${integer(s.interesses)}</span></div><div class="row"><span class="k">Acheteurs sur place</span><span class="v">${integer(s.acheteurs)}</span></div><div class="row"><span class="k">Newsletter</span><span class="v">${integer(s.newsletter)}</span></div><div class="row"><span class="k">À relancer</span><span class="v">${integer(s.relances)}</span></div></div><div class="info"><h5>Suivi</h5><div class="row"><span class="k">Niveau de suivi</span><span class="v">${relanceLabel(s.relanceLevel)}</span></div><div class="row"><span class="k">Conversion visiteurs / acheteurs</span><span class="v">${percent(conv)}</span></div><div class="row"><span class="k">Liste visiteurs</span><span class="v">${integer(visitorsCount)}</span></div><div class="row"><span class="k">Potentiel visiteurs</span><span class="v">${euro(totalVisitorPotential(s))}</span></div></div></div></div>
+    <div class="tab-pane ${detailTab==='public'?'active':''}"><div class="grid2"><div class="info"><h5>Public rencontré</h5><div class="row"><span class="k">Visiteurs intéressés</span><span class="v">${integer(s.interesses)}</span></div><div class="row"><span class="k">Acheteurs sur place</span><span class="v">${integer(s.acheteurs)}</span></div>
+<div class="row"><span class="k">Panier moyen (sur place)</span><span class="v">${euro(s.acheteurs ? ((s.salesOnsite||0)/s.acheteurs) : 0)}</span></div><div class="row"><span class="k">Newsletter</span><span class="v">${integer(s.newsletter)}</span></div><div class="row"><span class="k">À relancer</span><span class="v">${integer(s.relances)}</span></div></div><div class="info"><h5>Suivi</h5><div class="row"><span class="k">Niveau de suivi</span><span class="v">${relanceLabel(s.relanceLevel)}</span></div><div class="row"><span class="k">Conversion visiteurs / acheteurs</span><span class="v">${percent(conv)}</span></div><div class="row"><span class="k">Liste visiteurs</span><span class="v">${integer(visitorsCount)}</span></div></div></div></div>
 
     <div class="tab-pane ${detailTab==='stock'?'active':''}">${renderSalonStockTab(s)}</div>
 
@@ -674,7 +822,7 @@ function renderDetail(){
 
     <div class="tab-pane ${detailTab==='notes'?'active':''}"><div class="note-box"><h5>Cuvées présentées</h5><div class="pill-list">${winesHtml}</div></div><div class="note-box" style="margin-top:14px"><h5>Stock par cuvée</h5>${stockHtml(s)}</div><div class="note-box" style="margin-top:14px"><h5>Notes terrain</h5><p>${(s.notes || 'Aucune note enregistrée.').replace(/\n/g,'<br>')}</p></div></div>`;
 }
-function renderVisitorsTab(s){ const list = filteredVisitors(s); const total = totalVisitors(s); const hot = (s.visitors||[]).filter(v=>v.potentiel==='chaud').length; const rel = (s.visitors||[]).filter(v=>v.suivi==='a_relancer').length; const caveau = (s.visitors||[]).filter(v=>v.caveau==='oui').length; const potential = totalVisitorPotential(s); return `<div class="visitor-toolbar"><input class="input" id="visitorSearchInput" placeholder="Rechercher un visiteur, une ville, une note..." value="${escapeHtml(visitorSearch)}" oninput="updateVisitorSearch(this.value)"><button class="btn-primary btn-sm" onclick="openVisitorEditor()">+ Nouveau visiteur</button><button class="btn-soft btn-sm" onclick="exportCurrentVisitorsCSV()">Exporter visiteurs CSV</button></div><div class="visitor-stats"><div class="visitor-card"><div class="s">Visiteurs saisis</div><div class="b">${integer(total)}</div></div><div class="visitor-card"><div class="s">Intérêt chaud</div><div class="b">${integer(hot)}</div></div><div class="visitor-card"><div class="s">À relancer</div><div class="b">${integer(rel)}</div></div><div class="visitor-card"><div class="s">Visite caveau</div><div class="b">${integer(caveau)}</div></div></div><div class="visitor-list">${list.length ? list.map(v => visitorItemHtml(v)).join('') : '<div class="empty">Aucun visiteur dans ce salon.</div>'}</div><div class="note-box" style="margin-top:12px"><h5>Potentiel total de la liste</h5><p>${euro(potential)}</p></div>`; }
+function renderVisitorsTab(s){ const list = filteredVisitors(s); const total = totalVisitors(s); const hot = (s.visitors||[]).filter(v=>v.potentiel==='chaud').length; const rel = (s.visitors||[]).filter(v=>v.suivi==='a_relancer').length; const caveau = (s.visitors||[]).filter(v=>v.caveau==='oui').length; const potential = totalVisitorPotential(s); return `<div class="visitor-toolbar"><input class="input" id="visitorSearchInput" placeholder="Rechercher un visiteur, une ville, une note..." value="${escapeHtml(visitorSearch)}" oninput="updateVisitorSearch(this.value)"><button class="btn-primary btn-sm" onclick="openVisitorEditor()">+ Nouveau visiteur</button><button class="btn-soft btn-sm" onclick="exportCurrentVisitorsCSV()">Exporter visiteurs CSV</button></div><div class="visitor-stats"><div class="visitor-card"><div class="s">Visiteurs saisis</div><div class="b">${integer(total)}</div></div><div class="visitor-card"><div class="s">Intérêt chaud</div><div class="b">${integer(hot)}</div></div><div class="visitor-card"><div class="s">À relancer</div><div class="b">${integer(rel)}</div></div><div class="visitor-card"><div class="s">Visite caveau</div><div class="b">${integer(caveau)}</div></div></div><div class="visitor-list">${list.length ? list.map(v => visitorItemHtml(v)).join('') : '<div class="empty">Aucun visiteur dans ce salon.</div>'}</div>`; }
 function visitorItemHtml(v){ return `<div class="visitor-item"><div class="visitor-top"><div><div class="visitor-name">${escapeHtml(((v.prenom || '') + ' ' + (v.nom || '')).trim() || 'Sans nom')}</div><div class="visitor-meta">${v.ville ? `<span>📍 ${escapeHtml(v.ville)}</span>` : ''}${v.adresse ? `<span>🏠 ${escapeHtml(v.adresse)}</span>` : ''}${v.email ? `<span>✉ ${escapeHtml(v.email)}</span>` : ''}${v.tel ? `<span>☎ ${escapeHtml(v.tel)}</span>` : ''}${v.cuvees ? `<span>🍷 ${escapeHtml(v.cuvees)}</span>` : ''}</div></div><div style="text-align:right;font-weight:800">${euro(v.montant || 0)}</div></div><div class="visitor-badges"><span class="status pt-${v.potentiel}">${potentielLabel(v.potentiel)}</span><span class="status st-${v.suivi}">${suiviLabel(v.suivi)}</span><span class="status st-confirme">Newsletter ${v.newsletter === 'oui' ? 'oui' : 'non'}</span><span class="status st-aconfirmer">Caveau ${v.caveau === 'oui' ? 'oui' : 'non'}</span>${v.relance ? `<span class="status st-encours">Relance ${dateFr(v.relance)}</span>` : ''}</div>${v.notes ? `<div class="visitor-notes">${escapeHtml(v.notes)}</div>` : ''}<div class="visitor-actions"><button class="btn-soft btn-sm" onclick="openVisitorEditor('${v.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="deleteVisitor('${v.id}')">Supprimer</button></div></div>`; }
 function budgetLine(label, value, total){ const w = total > 0 ? Math.max(4, (n(value)/total)*100) : 4; return `<div style="margin-bottom:10px"><div class="row" style="padding:0 0 4px;border-bottom:none"><span class="k">${label}</span><span class="v">${euro(value)}</span></div><div class="bar"><div class="fill" style="width:${w}%"></div></div></div>`; }
 function renderActionList(){ const items = filteredSalons().slice(0,5).map(s => { let desc = 'Mettre à jour la fiche.'; if(s.statut==='accepter' || s.statut==='confirme' || s.statut==='encours' || s.statut==='termine') desc = 'Préparer les offres cartons, noter les ventes et relancer rapidement les meilleurs contacts.'; if(s.statut==='contacter' || s.statut==='prospection' || s.statut==='aconfirmer') desc = 'Comparer coût, trafic, profil visiteurs et potentiel de vente avant validation.'; if(s.statut==='refuser' || s.statut==='annule') desc = 'Conserver l’historique puis réallouer le budget sur un salon plus rentable.'; return `<div class="small-item"><div><div class="n">${s.nom}</div><div class="d">${desc}</div></div><span class="status st-${s.statut}">${statusLabel(s.statut)}</span></div>`; }); document.getElementById('actionList').innerHTML = items.length ? items.join('') : '<div class="empty">Aucune action disponible.</div>'; }
@@ -752,8 +900,15 @@ function renderSalonOptions(){
     let options = salons.map(s => `<option value="${s.id}">${label(s)}</option>`).join('');
     if(withOther) options += '<option value="__other__">Autre — région à préciser</option>';
     el.innerHTML = options;
+
+    // Trouver le salon "en cours" (aujourd'hui)
+    const today = new Date().toISOString().split('T')[0];
+    const currentRunning = salons.find(s => s.dateDebut <= today && (!s.dateFin || s.dateFin >= today));
+
     const validValues = salons.map(s => s.id).concat(withOther ? ['__other__'] : []);
+
     if(current && validValues.includes(current)) el.value=current;
+    else if(currentRunning) el.value=currentRunning.id; // Auto-select if currently running!
     else if(fallback && validValues.includes(fallback)) el.value=fallback;
     else if(salons[0]) el.value=salons[0].id;
     else if(withOther) el.value='__other__';
@@ -929,13 +1084,387 @@ function renderProClientList(){
   root.innerHTML = rows.map(({salon,pro}) => `<div class="pro-item"><div class="pro-top"><div><div class="pro-company">${escapeHtml(pro.entreprise || 'Sans nom')}</div><div class="pro-contact">${escapeHtml(((pro.prenom || '') + ' ' + (pro.nom || '')).trim() || 'Contact à compléter')} · ${escapeHtml(({'caviste':'Caviste','restaurant':'Restaurant','comite':'Comité d\'entreprise','autre':'Autre'})[pro.type] || pro.type || '—')}</div></div><span class="status pt-${pro.potentiel || 'tiede'}">${potentielLabel(pro.potentiel || 'tiede')}</span></div><div class="visitor-badges" style="margin-top:10px"><span class="status st-nouveau">Salon : ${escapeHtml(salon.nom)}</span>${salon.region ? `<span class="status st-confirme">${escapeHtml(salon.region)}</span>` : ''}${pro.ville ? `<span class="status st-confirme">${escapeHtml(pro.ville)}</span>` : ''}${pro.suivi ? `<span class="status st-a_relancer">${escapeHtml(pro.suivi)}</span>` : ''}</div><div class="visitor-notes" style="margin-top:10px">${pro.email ? `✉ ${escapeHtml(pro.email)}<br>` : ''}${pro.tel ? `☎ ${escapeHtml(pro.tel)}<br>` : ''}${pro.volume ? `📦 ${escapeHtml(pro.volume)}` : ''}</div>${pro.notes ? `<div class="visitor-notes">${escapeHtml(pro.notes)}</div>` : ''}<div class="visitor-actions"><button class="btn-soft btn-sm" onclick="editPro('${salon.id}','${pro.id}')">Modifier</button><button class="btn-soft btn-sm" onclick="setAppView('pro'); document.getElementById('p_salonId').value='${salon.id}'; renderProList();">Voir dans Pro</button></div></div>`).join('');
 }
 
-function renderAll(){ renderYearFilter(); renderHero(); renderDashboard(); renderCards(); renderDetail(); renderActionList(); renderSalonOptions(); renderGlobalClients(); renderProList(); renderProClientList(); updateAppView(); saveData(); }
+
+let currentCalYear = new Date().getFullYear();
+
+function changeCalYear(delta) {
+    currentCalYear += delta;
+    renderCalendrier();
+}
+
+function renderCalendrier() {
+    const root = document.getElementById('calendrierTimeline');
+    if(!root) return;
+    document.getElementById('calYearDisplay').innerText = currentCalYear;
+
+    const salonDates = {};
+    salons.filter(s => s.id !== 'other_pro' && s.dateDebut).forEach(s => {
+        let start = new Date(s.dateDebut);
+        let end = s.dateFin ? new Date(s.dateFin) : new Date(s.dateDebut);
+
+        let dt = new Date(start);
+        while(dt <= end) {
+            const dateStr = dt.toISOString().split('T')[0];
+            salonDates[dateStr] = s;
+            dt.setDate(dt.getDate() + 1);
+        }
+    });
+
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    let h = '';
+
+    for(let month = 0; month < 12; month++) {
+        h += `<div class="cal-month"><h4 style="text-align:center; margin:0 0 10px 0; color:var(--wine);">${months[month]}</h4>`;
+        h += `<div class="cal-days-header"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>`;
+        h += `<div class="cal-grid">`;
+
+        let firstDay = new Date(currentCalYear, month, 1).getDay();
+        let daysInMonth = new Date(currentCalYear, month + 1, 0).getDate();
+        firstDay = firstDay === 0 ? 6 : firstDay - 1;
+
+        for(let i=0; i<firstDay; i++) {
+            h += `<div></div>`;
+        }
+
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateStr = `${currentCalYear}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const s = salonDates[dateStr];
+
+            if(s) {
+                h += `<div class="cal-day active-salon" title="${s.nom}" onclick="activeId='${s.id}'; setAppView('salons');">${d}</div>`;
+            } else {
+                h += `<div class="cal-day">${d}</div>`;
+            }
+        }
+        h += `</div></div>`;
+    }
+    root.innerHTML = h;
+}
+
+function renderYoY(current) {
+  if(!current) return '';
+  const matches = salons.filter(x => 
+      x.id !== 'other_pro' && 
+      x.id !== current.id && 
+      x.nom && current.nom &&
+      x.nom.toLowerCase().trim() === current.nom.toLowerCase().trim()
+  ).sort((a,b) => b.dateDebut.localeCompare(a.dateDebut));
+
+  if(!matches.length) return '';
+
+  let rows = '';
+  matches.forEach(prev => {
+     const caCurrent = totalCA(current);
+     const caPrev = totalCA(prev);
+     const evoCA = caPrev > 0 ? Math.round(((caCurrent - caPrev) / caPrev) * 100) : 0;
+     const colorCA = evoCA > 0 ? '#2d6346' : (evoCA < 0 ? '#8c403c' : 'inherit');
+     const signCA = evoCA > 0 ? '+' : '';
+
+     const visCurrent = totalVisitors(current);
+     const visPrev = totalVisitors(prev);
+     const evoVis = visPrev > 0 ? Math.round(((visCurrent - visPrev) / visPrev) * 100) : 0;
+     const colorVis = evoVis > 0 ? '#2d6346' : (evoVis < 0 ? '#8c403c' : 'inherit');
+     const signVis = evoVis > 0 ? '+' : '';
+
+     rows += `
+       <div class="row">
+         <span class="k" style="font-weight:800;">${prev.dateDebut.substring(0,4)}</span>
+         <span class="v">
+            CA: <strong>${euro(caPrev)}</strong> <span style="color:${colorCA}; font-size:0.8rem; margin-right:10px;">(${signCA}${evoCA}%)</span>
+            Visiteurs: <strong>${visPrev}</strong> <span style="color:${colorVis}; font-size:0.8rem;">(${signVis}${evoVis}%)</span>
+         </span>
+       </div>
+     `;
+  });
+
+  return `
+    <div class="note-box" style="margin-top:14px; background:linear-gradient(180deg, #fffdfa, #f4f8f5); border-color:#d4e6db;">
+      <h5 style="color:#2d6346;">📈 Historique & Évolution (Année sur Année)</h5>
+      <p style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">Comparaison de l'édition actuelle avec les éditions passées de "${current.nom}"</p>
+      ${rows}
+    </div>
+  `;
+}
+
+
+function toggleKioskMode(enable) {
+    if(enable) {
+        document.body.classList.add('kiosk-mode');
+        try {
+            const doc = window.document;
+            const docEl = doc.documentElement;
+            const requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullScreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+            if(requestFullScreen) requestFullScreen.call(docEl);
+        } catch(e) { console.warn("Fullscreen API failed", e); }
+        if(typeof toast === 'function') toast("Mode borne activé.");
+    } else {
+        const pin = prompt("🔐 Entrez le code PIN (0000) pour quitter le mode borne :");
+        if(pin === "0000") {
+            document.body.classList.remove('kiosk-mode');
+            try {
+                const doc = window.document;
+                const cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+                if(cancelFullScreen) cancelFullScreen.call(doc);
+            } catch(e) { console.warn("Exit Fullscreen API failed", e); }
+            if(typeof toast === 'function') toast("Mode borne désactivé.");
+        } else if (pin !== null) {
+            alert("Code PIN incorrect !");
+        }
+    }
+}
+
+
+function exportJournalCSV() {
+    if(!salons.length) { toast("Aucun salon à exporter."); return; }
+    let csv = "ID,Nom du Salon,Date Debut,Date Fin,Statut,Type,Budget Total,CA Sur Place,CA Apres,CA Total,CA CDR,CA CDP,Objectif CA,ROI (%)\n";
+    salons.forEach(s => {
+        if(s.id === 'other_pro') return;
+        const b = totalBudget(s);
+        const c = totalCA(s);
+        const r = b > 0 ? ((c - b)/b)*100 : 0;
+        const row = [
+            s.id, `"${(s.nom||'').replace(/"/g, '""')}"`, s.dateDebut||'', s.dateFin||'', s.statut||'', s.type||'',
+            b, s.salesOnsite||0, s.salesAfter||0, c,
+            s.caCdr||0, s.caCdp||0, s.objCa||0, r.toFixed(2)
+        ];
+        csv += row.join(',') + "\n";
+    });
+    const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `journal_comptable_salons_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+function updateObjectiveBanner() { generateQR();
+    const banner = document.getElementById('objectiveBanner');
+    const sid = document.getElementById('gc_salonId')?.value;
+    if(!banner || !sid) return;
+    const s = salons.find(x => x.id === sid);
+    if(s && (s.objCa > 0 || s.objCartons > 0)) {
+        banner.classList.remove('hidden');
+        document.getElementById('objCaText').innerText = s.objCa ? `Cible CA: ${euro(s.objCa)}` : '';
+        document.getElementById('objCartonsText').innerText = s.objCartons ? `${s.objCartons} cartons à écouler` : '';
+    } else {
+        banner.classList.add('hidden');
+    }
+}
+
+function showKioskSuccess() {
+    const overlay = document.getElementById('kioskSuccess');
+    if(overlay) overlay.classList.remove('hidden');
+}
+
+function closeKioskSuccess() {
+    const overlay = document.getElementById('kioskSuccess');
+    if(overlay) overlay.classList.add('hidden');
+    resetGlobalClientForm();
+}
+
+
+// --- PANIER RAPIDE ---
+function modQty(id, delta) {
+    const el = document.getElementById(id);
+    let val = parseInt(el.value || 0) + delta;
+    if(val < 0) val = 0;
+    el.value = val;
+    calcCart();
+}
+
+function modQtyC(id, delta) {
+    const el = document.getElementById(id);
+    let val = parseInt(el.value || 0) + delta;
+    if(val < 0) val = 0;
+    el.value = val;
+    calcCartC();
+}
+function calcCartC() {
+    const qCdr = parseInt(document.getElementById('gc_qtyCdr').value || 0);
+    const pCdr = parseFloat(document.getElementById('gc_pxCdr').value || 0);
+    const qCdp = parseInt(document.getElementById('gc_qtyCdp').value || 0);
+    const pCdp = parseFloat(document.getElementById('gc_pxCdp').value || 0);
+    const total = (qCdr * pCdr) + (qCdp * pCdp);
+    document.getElementById('cartTotalDisplayC').innerText = total.toFixed(2);
+    return total;
+}
+function applyCartC() {
+    const t = calcCartC();
+    document.getElementById('gc_montant').value = t;
+    const qCdr = parseInt(document.getElementById('gc_qtyCdr').value || 0);
+    const qCdp = parseInt(document.getElementById('gc_qtyCdp').value || 0);
+    let text = [];
+    if(qCdr > 0) text.push(qCdr + ' CDR');
+    if(qCdp > 0) text.push(qCdp + ' CDP');
+    if(text.length > 0) {
+        let el = document.getElementById('gc_cuvees') || document.getElementById('gc_notes');
+        if(el) {
+            el.value = el.value ? el.value + ' - ' + text.join(' / ') : text.join(' / ');
+        }
+    }
+}
+
+function calcCart() {
+    const qCdr = parseInt(document.getElementById('v_qtyCdr').value || 0);
+    const pCdr = parseFloat(document.getElementById('v_pxCdr').value || 0);
+    const qCdp = parseInt(document.getElementById('v_qtyCdp').value || 0);
+    const pCdp = parseFloat(document.getElementById('v_pxCdp').value || 0);
+    const total = (qCdr * pCdr) + (qCdp * pCdp);
+    document.getElementById('cartTotalDisplay').innerText = total.toFixed(2);
+    return total;
+}
+function applyCart() {
+    const t = calcCart();
+    document.getElementById('v_montant').value = t;
+
+    // Auto-update cuvees text
+    const qCdr = parseInt(document.getElementById('v_qtyCdr').value || 0);
+    const qCdp = parseInt(document.getElementById('v_qtyCdp').value || 0);
+    let text = [];
+    if(qCdr > 0) text.push(qCdr + ' CDR');
+    if(qCdp > 0) text.push(qCdp + ' CDP');
+    if(text.length > 0) {
+        document.getElementById('v_cuvees').value = text.join(' / ');
+        document.getElementById('v_suivi').value = 'vendu';
+    }
+}
+
+// --- GRAPHIQUES ---
+let chartGammeInstance = null;
+let chartMoisInstance = null;
+
+function renderCharts() {
+    if(typeof Chart === 'undefined') {
+        setTimeout(renderCharts, 200);
+        return;
+    }
+
+    let totalCdr = 0;
+    let totalCdp = 0;
+    let monthlyData = {};
+
+    salons.forEach(s => {
+        if(s.id === 'other_pro') return;
+        totalCdr += (s.caCdr || 0);
+        totalCdp += (s.caCdp || 0);
+
+        if(s.dateDebut) {
+            const m = s.dateDebut.substring(0, 7); // YYYY-MM
+            monthlyData[m] = (monthlyData[m] || 0) + totalCA(s);
+        }
+    });
+
+    // Chart Gamme (Pie)
+    const ctxGamme = document.getElementById('chartGamme');
+    if(ctxGamme) {
+        if(chartGammeInstance) chartGammeInstance.destroy();
+        chartGammeInstance = new Chart(ctxGamme, {
+            type: 'doughnut',
+            data: {
+                labels: ['Côtes du Rhône', 'Châteauneuf-du-Pape'],
+                datasets: [{
+                    data: [totalCdr, totalCdp],
+                    backgroundColor: ['#b88c45', '#6f2132']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    // Chart Mois (Bar)
+    const ctxMois = document.getElementById('chartMois');
+    if(ctxMois) {
+        const sortedMonths = Object.keys(monthlyData).sort();
+        const dataMois = sortedMonths.map(m => monthlyData[m]);
+
+        if(chartMoisInstance) chartMoisInstance.destroy();
+        chartMoisInstance = new Chart(ctxMois, {
+            type: 'bar',
+            data: {
+                labels: sortedMonths,
+                datasets: [{
+                    label: 'CA Total (€)',
+                    data: dataMois,
+                    backgroundColor: '#2d6346'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+}
+
+// --- QR CODE COUPE-FILE ---
+function generateQR() {
+    const container = document.getElementById('qrCodeContainer');
+    if(!container) return;
+
+    // Si nous sommes en local (file://), window.location.origin pose problème.
+    // On génère une URL absolue basée sur le chemin actuel.
+    let link = window.location.href.split('?')[0]; 
+    const activeSalon = document.getElementById('gc_salonId')?.value || '';
+    link += '?kiosk=1&salon=' + activeSalon;
+
+    // Utiliser l'API QuickChart pour générer le QR (100% fiable sans dépendance JS capricieuse)
+    const qrUrl = "https://quickchart.io/qr?text=" + encodeURIComponent(link) + "&size=150&dark=6f2132";
+    container.innerHTML = `<img src="${qrUrl}" alt="QR Code Coupe-file" style="width:150px; height:150px;">`;
+}
+
+function renderAll(){ generateQR(); renderCharts(); renderYearFilter(); renderHero(); renderDashboard(); renderCalendrier(); renderCards(); renderDetail(); renderActionList(); renderSalonOptions(); renderGlobalClients(); renderProList(); renderProClientList(); updateAppView(); saveData(); }
 function selectSalon(id){ activeId = id; visitorSearch=''; const proSalon=document.getElementById('p_salonId'); if(proSalon && !document.getElementById('p_id')?.value) proSalon.value = id; appView='salons'; document.body.classList.add('ipad-mode');
 renderAll(); }
 function setDetailTab(tab){ detailTab = tab; renderDetail(); }
 function updateVisitorSearch(v){ visitorSearch = v || ''; renderDetail(); }
 function setAppView(view){ appView = view; updateAppView(); }
-function updateAppView(){ const dashboardView=document.getElementById('viewDashboard'); const salonsView=document.getElementById('viewSalons'); const salonsFilters=document.getElementById('viewSalonsFilters'); const newSalonView=document.getElementById('viewNewSalon'); const clientsView=document.getElementById('viewClients'); const clientListView=document.getElementById('viewClientList'); const proView=document.getElementById('viewPro'); const proListView=document.getElementById('viewProList'); const t0=document.getElementById('appTabDashboard'); const t1=document.getElementById('appTabSalons'); const tNew=document.getElementById('appTabNewSalon'); const t2=document.getElementById('appTabClients'); const t3=document.getElementById('appTabClientList'); const t4=document.getElementById('appTabPro'); const t5=document.getElementById('appTabProList'); if(!dashboardView || !salonsView || !salonsFilters || !newSalonView || !clientsView || !clientListView || !proView || !proListView) return; dashboardView.classList.toggle('hidden', appView!=='dashboard'); salonsFilters.classList.toggle('hidden', appView!=='salons'); salonsView.classList.toggle('hidden', appView!=='salons'); newSalonView.classList.toggle('hidden', true); clientsView.classList.toggle('hidden', appView!=='clients'); clientListView.classList.toggle('hidden', appView!=='clientList'); proView.classList.toggle('hidden', appView!=='pro'); proListView.classList.toggle('hidden', appView!=='proList'); t0.classList.toggle('active', appView==='dashboard'); t1.classList.toggle('active', appView==='salons'); if(tNew) tNew.classList.toggle('active', false); t2.classList.toggle('active', appView==='clients'); t3.classList.toggle('active', appView==='clientList'); t4.classList.toggle('active', appView==='pro'); t5.classList.toggle('active', appView==='proList'); }
+function updateAppView(){
+  const dashboardView=document.getElementById('viewDashboard');
+  const calendrierView=document.getElementById('viewCalendrier');
+  const salonsView=document.getElementById('viewSalons');
+  const salonsFilters=document.getElementById('viewSalonsFilters');
+  const newSalonView=document.getElementById('viewNewSalon');
+  const clientsView=document.getElementById('viewClients');
+  const clientListView=document.getElementById('viewClientList');
+  const proView=document.getElementById('viewPro');
+  const proListView=document.getElementById('viewProList');
+
+  const tC=document.getElementById('appTabCalendrier');
+  const t0=document.getElementById('appTabDashboard');
+  const t1=document.getElementById('appTabSalons');
+  const tNew=document.getElementById('appTabNewSalon');
+  const t2=document.getElementById('appTabClients');
+  const t3=document.getElementById('appTabClientList');
+  const t4=document.getElementById('appTabPro');
+  const t5=document.getElementById('appTabProList');
+
+  if(!dashboardView || !salonsView) return;
+
+  dashboardView.classList.toggle('hidden', appView!=='dashboard');
+  if(calendrierView) calendrierView.classList.toggle('hidden', appView!=='calendrier');
+  salonsFilters.classList.toggle('hidden', appView!=='salons');
+  salonsView.classList.toggle('hidden', appView!=='salons');
+  newSalonView.classList.toggle('hidden', true);
+  clientsView.classList.toggle('hidden', appView!=='clients');
+  clientListView.classList.toggle('hidden', appView!=='clientList');
+  proView.classList.toggle('hidden', appView!=='pro');
+  proListView.classList.toggle('hidden', appView!=='proList');
+
+  if(tC) tC.classList.toggle('active', appView==='calendrier');
+  t0.classList.toggle('active', appView==='dashboard');
+  t1.classList.toggle('active', appView==='salons');
+  if(tNew) tNew.classList.toggle('active', false);
+  t2.classList.toggle('active', appView==='clients');
+  t3.classList.toggle('active', appView==='clientList');
+  t4.classList.toggle('active', appView==='pro');
+  t5.classList.toggle('active', appView==='proList');
+}
 function resetGlobalClientForm(){ const form=document.getElementById('globalClientForm'); if(form) form.reset(); renderSalonOptions(); }
 function saveGlobalClient(){
   const salonId=document.getElementById('gc_salonId').value;
@@ -965,9 +1494,14 @@ function saveGlobalClient(){
   salon.visitors.unshift(obj);
   salon.updatedAt = new Date().toISOString();
   activeId = salon.id;
-  resetGlobalClientForm();
-  toast('Informations envoyées et reliées au salon.');
-  renderAll();
+  if(document.body.classList.contains('kiosk-mode')) {
+      showKioskSuccess();
+      renderAll();
+  } else {
+      resetGlobalClientForm();
+      toast('Informations envoyées et reliées au salon.');
+      renderAll();
+  }
 }
 
 function openSalonEditor(id=null){ const s = salons.find(x=>x.id===id); document.getElementById('salonModalTitle').textContent = s ? 'Modifier le salon' : 'Nouveau salon'; document.getElementById('f_id').value = s?.id || ''; document.getElementById('f_nom').value = s?.nom || ''; document.getElementById('f_dateDebut').value = s?.dateDebut || ''; document.getElementById('f_dateFin').value = s?.dateFin || ''; document.getElementById('f_ville').value = s?.ville || ''; document.getElementById('f_region').value = s?.region || ''; document.getElementById('f_statut').value = s?.statut || 'contacter'; document.getElementById('f_type').value = s?.type || 'grand_public'; document.getElementById('f_organisateur').value = s?.organisateur || ''; document.getElementById('f_surface').value = s?.surface || ''; document.getElementById('f_stockCuvees').value = s?.stockCuvees || (s?.stockPris ? ('Stock total ; ' + s.stockPris) : ''); document.getElementById('f_siteWeb').value = s?.siteWeb || ''; document.getElementById('f_vins').value = s?.vins || ''; document.getElementById('f_costStand').value = s?.costStand || ''; document.getElementById('f_costTravel').value = s?.costTravel || ''; document.getElementById('f_costLodging').value = s?.costLodging || ''; document.getElementById('f_costSamples').value = s?.costSamples || ''; document.getElementById('f_costOther').value = s?.costOther || ''; document.getElementById('f_salesOnsite').value = s?.salesOnsite || ''; document.getElementById('f_salesAfter').value = s?.salesAfter || ''; document.getElementById('f_interesses').value = s?.interesses || ''; document.getElementById('f_acheteurs').value = s?.acheteurs || ''; document.getElementById('f_newsletter').value = s?.newsletter || ''; document.getElementById('f_relances').value = s?.relances || ''; document.getElementById('f_relanceLevel').value = s?.relanceLevel || 'aucune'; document.getElementById('f_nextAction').value = s?.nextAction || ''; document.getElementById('f_notes').value = s?.notes || ''; updateBudgetPreview(); document.getElementById('salonModal').classList.add('open'); }
@@ -1008,5 +1542,32 @@ document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeSalonEdit
 
 renderAll();
 </script>
+<button class="btn-danger btn-sm exit-kiosk-btn" onclick="toggleKioskMode(false)">Quitter le mode borne</button>
+
+<script>
+// Vérification si l'URL demande directement le mode kiosk (Coupe-file)
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        if(params.get('kiosk') === '1') {
+            const requestedSalon = params.get('salon');
+            if(requestedSalon) {
+                const sel = document.getElementById('gc_salonId');
+                if(sel) sel.value = requestedSalon;
+            }
+            setAppView('clients');
+            document.body.classList.add('kiosk-mode');
+            // Hide the QR box in mobile view to avoid inception
+            const qrbox = document.getElementById('qrBox');
+            if(qrbox) qrbox.style.display = 'none';
+            // Hide the exit button fully on clients phones
+            const exitBtn = document.querySelector('.exit-kiosk-btn');
+            if(exitBtn) exitBtn.style.display = 'none';
+            toast('Formulaire coupe-file chargé.');
+        }
+    }, 500); // Wait for data to init
+});
+</script>
 </body>
+
 </html>
